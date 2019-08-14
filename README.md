@@ -73,6 +73,9 @@ If you are importing modules for which you don't have the typings you can ignore
 
 ## release notes
 
+#### v3.7.2
+- upgrade typescript to v3.7.2
+
 #### v2.6.2
 - typescript version upgrade
 - upgrade to sbt-web 1.4.3

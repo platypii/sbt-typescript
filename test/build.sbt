@@ -1,6 +1,4 @@
 
-
-
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
@@ -16,7 +14,7 @@ assertCompilation in typescript := true
 //logLevel in jasmine := Level.Info
 
 libraryDependencies ++= Seq(
-  "org.webjars.npm" % "types__jasmine" % "2.5.40"
+  "org.webjars.npm" % "types__jasmine" % "2.8.16"
 )
 
 resolveFromWebjarsNodeModulesDir := true
