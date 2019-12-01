@@ -1,9 +1,9 @@
 sbtPlugin := true
-organization := "name.de-vries"
+organization := "com.github.platypii"
 name := "sbt-typescript"
 version := "3.7.2"
 
-homepage := Some(url("https://github.com/joost-de-vries/sbt-typescript"))
+homepage := Some(url("https://github.com/platypii/sbt-typescript"))
 licenses +=("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 
 scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
@@ -12,7 +12,7 @@ scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
   case _             => sys error s"Unhandled sbt version ${sbtCrossVersion.value}"
 })
 
-crossSbtVersions := Seq("1.3.4")
+crossSbtVersions := Seq("1.3.8")
 
 val sbtCrossVersion = sbtVersion in pluginCrossBuild
 
@@ -58,7 +58,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.2")
 publishMavenStyle := false
 bintrayRepository in bintray := "sbt-plugins"
 bintrayOrganization in bintray := None
-bintrayVcsUrl := Some("git@github.com:joost-de-vries/sbt-typescript.git")
+bintrayVcsUrl := Some("https://github.com/platypii/sbt-typescript")
 
 enablePlugins(SbtPlugin)
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")

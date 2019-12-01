@@ -1,4 +1,4 @@
-addSbtPlugin("name.de-vries" % "sbt-typescript" % sys.props("project.version"))
+addSbtPlugin("com.github.platypii" % "sbt-typescript" % sys.props("project.version"))
 
 //logLevel := Level.Debug
 resolvers ++= Seq(

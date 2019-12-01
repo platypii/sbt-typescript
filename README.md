@@ -1,5 +1,6 @@
 # sbt-typescript 
 
+[ ![Download](https://api.bintray.com/packages/platypii/sbt-plugins/sbt-typescript/images/download.svg) ](https://bintray.com/platypii/sbt-plugins/sbt-typescript/_latestVersion)
 [![Build Status](https://travis-ci.org/joost-de-vries/sbt-typescript.png?branch=master)](https://travis-ci.org/joost-de-vries/sbt-typescript)
 
 This sbt plugin compiles the Typescript code in your Play application to javascript fit for consumption by your average browser and device.   
@@ -20,7 +21,7 @@ To be able to view the original Typescript code from your browser when developin
 
 Add the following line to your `project\plugins.sbt`:
 
-    addSbtPlugin("name.de-vries" % "sbt-typescript" % "2.6.2")
+    addSbtPlugin("com.github.platypii" % "sbt-typescript" % "3.7.2")
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
 
@@ -75,6 +76,7 @@ If you are importing modules for which you don't have the typings you can ignore
 
 #### v3.7.2
 - upgrade typescript to v3.7.2
+- sbt-typescript project adopted by platypii
 
 #### v2.6.2
 - typescript version upgrade
