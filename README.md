@@ -2,15 +2,23 @@
 
 [ ![Download](https://api.bintray.com/packages/platypii/sbt-plugins/sbt-typescript/images/download.svg) ](https://bintray.com/platypii/sbt-plugins/sbt-typescript/_latestVersion)
 [![Build Status](https://travis-ci.org/joost-de-vries/sbt-typescript.png?branch=master)](https://travis-ci.org/joost-de-vries/sbt-typescript)
+[![Maven Artifact](https://img.shields.io/maven-central/v/com.github.platypii/sbt-typescript.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
 
-This sbt plugin compiles the Typescript code in your Play application to javascript fit for consumption by your average browser and device.   
+This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
+Leverages the functionality of com.typesafe.sbt:js-engine to run the typescript compiler.
 
-### Getting started
-The easiest way to get started is to use the demo projects for [Angular2](https://github.com/joost-de-vries/play-angular2-typescript) or [React](https://github.com/joost-de-vries/play-reactjs-typescript). You can create the Angular2 application locally by running `sbt new joost-de-vries/play-angular-typescript.g8`. For the React application that's `sbt new joost-de-vries/play-reactjs-typescript.g8`  
-   
-### Configuring
-Create a `tsconfig.json` file in the root of your project with the required [compiler options](http://www.typescriptlang.org/docs/handbook/compiler-options.html). The following `tsc` compiler options are managed by `sbt-typescript` so setting them in `tsconfig.json` has no effect: `outDir`, `rootDirs`, `paths`, `baseUrl`, `typeRoots`.  
-If you use the `stage` compile mode the `outFile` option is also managed by `sbt-typescript`.  
+### Configuration
+
+Create a `tsconfig.json` file in the root of your project with the required [compiler options](http://www.typescriptlang.org/docs/handbook/compiler-options.html).
+
+The following `tsc` compiler options are managed by `sbt-typescript` so setting them in `tsconfig.json` has no effect: `outDir`, `rootDirs`, `paths`, `baseUrl`, `typeRoots`. If you use the `stage` compile mode the `outFile` option is also managed by `sbt-typescript`.
+
+Option                 | Description
+-----------------------|------------
+outFile                | Concatenate and emit output to a single file.
+outDir                 | Destination directory for output files.
+typingsFile            | A file that refers to typings that the build needs. Default None, but would normally be "/typings/index.d.ts"
+
 To be able to view the original Typescript code from your browser when developing add the following to `tsconfig.json`
 ```json
 "compilerOptions": {
@@ -44,9 +52,9 @@ Add the following to `build.sbt` to resolve against those npms.
 
     resolveFromWebjarsNodeModulesDir := true
 
-To lint your Typescript code add [`sbt-tslint`](https://github.com/joost-de-vries/sbt-tslint) to your project and create a `tslint.json` file with the linting rules.
+To lint your TypeScript code add [`sbt-tslint`](https://github.com/joost-de-vries/sbt-tslint) to your project and create a `tslint.json` file with the linting rules.
 
-To test your Typescript code add an sbt plugin for a JS testframework. For instance [sbt-jasmine](https://github.com/joost-de-vries/sbt-jasmine) or [sbt-mocha](https://github.com/sbt/sbt-mocha). You can override `tsc` configurations for your test code. To do that create a file `tsconfig.test.json` and add to `build.sbt`
+To test your TypeScript code add an sbt plugin for a JS testframework. For instance [sbt-jasmine](https://github.com/joost-de-vries/sbt-jasmine) or [sbt-mocha](https://github.com/sbt/sbt-mocha). You can override `tsc` configurations for your test code. To do that create a file `tsconfig.test.json` and add to `build.sbt`
 
     (projectTestFile in typescript) := Some("tsconfig.test.json")
 
@@ -56,7 +64,7 @@ Any settings in that file will override those in `tsconfig.json` for the compila
 The typescript version of your project can be found in `project/target/node-modules/webjars/typescript` Configure your IDE to use that and point it to the `tsconfig.json`.
 
 #### Compiling directly through tsc
-Sometimes it can be helpful to compile your project directly through the Typescript compiler without `sbt-typescript` in between to check whether a problem is an `sbt-typescript` problem. To do that you can run
+Sometimes it can be helpful to compile your project directly through the TypeScript compiler without `sbt-typescript` in between to check whether a problem is an `sbt-typescript` problem. To do that you can run
 
     project/target/node-modules/webjars/typescript/bin/tsc -p . -w
 Make sure to set the executable bit if necessary.
@@ -179,12 +187,10 @@ Hence the alfa moniker to see whether f.i. @types resolution still works.
 - fixes a nasty bug in module resolution. This is essential for angular2 applications.
 - gives feedback on faulty compiler options.
 
-## status
-The plugin is young. Currently it is mostly tested against `EngineType.Node` and Angular2 applications with npm style dependencies.  
-There are some other features I'm planning to implement.
+## History
 
-## history
-I started this plugin because the features I mentioned above were [missing](https://github.com/ArpNetworking/sbt-typescript/issues/1) in the [existing](https://github.com/ArpNetworking/sbt-typescript/issues/31) [plugins](https://github.com/ArpNetworking/sbt-typescript/issues/23#issuecomment-158099296).  
-And since I'd like Play and sbt(-web) to be kickass build tools for Typescript and Angular2 applications, and I wanted to give back to the open source community, I thought I'd implement it myself.. But not by writing javascript if I could just as well write Typescript...   
-Kudos to Brendan Arp for his [javascript tsc driver](https://github.com/ArpNetworking/sbt-typescript/blob/master/src/main/resources/typescriptc.js) to get me started. And also to all of the other plugins mentioned [here](https://github.com/sbt/sbt-web). Open source is an amazing tool for collective learning. Just imagine those poor programmers in the 1970s with only IBM manuals to provide them with information.
+This project was started by Brandon Arp: https://github.com/ArpNetworking/sbt-typescript
 
+With further contributions by Joost de Vries: https://github.com/joost-de-vries/sbt-typescript
+
+Adopted by platypii: https://github.com/platypii/sbt-typescript
