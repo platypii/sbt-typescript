@@ -1,4 +1,4 @@
-package name.devries.sbt.typescript
+package com.platypii.typescript
 
 case class CompilerOptions(module:Option[String],
                            outFile:Option[String],

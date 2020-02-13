@@ -1,4 +1,4 @@
-package name.devries.sbt.typescript
+package com.platypii.typescript
 
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 import com.typesafe.sbt.jse.SbtJsTask
@@ -13,7 +13,7 @@ import spray.json.{JsArray, JsString, _}
 
 /** typescript compilation can run during 'sbt assets' compilation or during Play 'sbt stage' as a sbt-web pipe */
 sealed class CompileMode(val value: String) {
-  override def toString = value
+  override def toString: String = value
 }
 
 object CompileMode {
@@ -23,7 +23,7 @@ object CompileMode {
   case object Stage extends CompileMode("stage")
 
   val values: Set[CompileMode] = Set(Compile, Stage)
-  val parse = values.map(v => v.value -> v).toMap
+  val parse: Map[String, CompileMode] = values.map(v => v.value -> v).toMap
 }
 
 object SbtTypescript extends AutoPlugin with JsonProtocol {
