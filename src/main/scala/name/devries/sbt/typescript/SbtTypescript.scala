@@ -1,6 +1,5 @@
 package name.devries.sbt.typescript
 
-
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.jse.SbtJsTask.autoImport.JsTaskKeys._
@@ -11,7 +10,6 @@ import com.typesafe.sbt.web.pipeline.Pipeline
 import sbt.Keys._
 import sbt.{File, _}
 import spray.json.{JsArray, JsString, _}
-
 
 /** typescript compilation can run during 'sbt assets' compilation or during Play 'sbt stage' as a sbt-web pipe */
 sealed class CompileMode(val value: String) {
@@ -30,7 +28,7 @@ object CompileMode {
 
 object SbtTypescript extends AutoPlugin with JsonProtocol {
 
-  override def requires = SbtJsTask
+  override def requires: SbtJsTask.type = SbtJsTask
 
   override def trigger = AllRequirements
 
@@ -232,30 +230,4 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
       minustypescriptMappings
   }
 
-}
-
-object JsonUtil {
-  def merge(tsConfig: JsObject, tsConfigOverride: JsObject): JsObject = {
-    val keys = tsConfig.fields.keySet ++ tsConfigOverride.fields.keySet
-    val merged = keys.map { key =>
-      (for {v1 <- tsConfig.getFields(key).headOption
-            v2 <- tsConfigOverride.getFields(key).headOption
-      } yield {
-        v2 match {
-          case JsNull => key -> JsNull
-          case v: JsString => key -> v
-          case v: JsBoolean => key -> v
-          case v: JsNumber => key -> v
-          case v: JsArray => v1 match {
-            case JsArray(elements) => key -> JsArray(elements ++ v.elements)
-            case other => throw new IllegalArgumentException(s"can't override $key with $v value with $other")
-          }
-          case v: JsObject => key -> new JsObject(v1.asJsObject.fields ++ v.fields)
-        }
-
-      }).orElse(tsConfig.getFields(key).headOption.map(key -> _)).orElse(tsConfigOverride.getFields(key).headOption.map(key -> _))
-
-    }
-    new JsObject(merged.flatten.toMap)
-  }
 }
