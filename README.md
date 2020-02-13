@@ -29,7 +29,7 @@ To be able to view the original Typescript code from your browser when developin
 
 Add the following line to your `project\plugins.sbt`:
 
-    addSbtPlugin("com.github.platypii" % "sbt-typescript" % "3.7.2")
+    addSbtPlugin("com.github.platypii" % "sbt-typescript" % "3.7.5")
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
 
@@ -81,6 +81,9 @@ If you are importing modules for which you don't have the typings you can ignore
     
 
 ## release notes
+
+#### v3.7.5
+- upgrade typescript to v3.7.5
 
 #### v3.7.2
 - upgrade typescript to v3.7.2
