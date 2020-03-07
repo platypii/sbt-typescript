@@ -1,7 +1,7 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "3.7.5"
+version := "3.8.3"
 
 scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
   case Some((0, 13)) => "2.10.6"
@@ -28,7 +28,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
 
   // js dependencies
-  "org.webjars.npm" % "typescript" % "3.7.5",
+  "org.webjars.npm" % "typescript" % "3.8.3",
   "org.webjars.npm" % "minimatch" % "3.0.4",
   "org.webjars.npm" % "fs-extra" % "8.1.0",
   "org.webjars.npm" % "es6-shim" % "0.35.5"

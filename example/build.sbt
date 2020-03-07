@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "com.google.inject" % "guice" % "4.2.2",
   // WebJars
   "org.webjars" % "requirejs" % "2.3.6",
-  "org.webjars.npm" % "types__jquery" % "3.3.31",
+  "org.webjars.npm" % "types__jquery" % "3.3.33",
   "org.webjars.npm" % "types__sizzle" % "2.3.2" // needed for types__jquery
 )
 

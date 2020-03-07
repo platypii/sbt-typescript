@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/fs-extra": "8.0.0",
     "@types/node": "^12.7.1",
-    "typescript": "3.7.2",
+    "typescript": "3.8.3",
     "rimraf": "^2.7.0"
   }
 }
