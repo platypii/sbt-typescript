@@ -1,16 +1,15 @@
-# sbt-typescript 
+# sbt-typescript
 
-[ ![Download](https://api.bintray.com/packages/platypii/sbt-plugins/sbt-typescript/images/download.svg) ](https://bintray.com/platypii/sbt-plugins/sbt-typescript/_latestVersion)
+[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](https://travis-ci.org/joost-de-vries/sbt-typescript.png?branch=master)](https://travis-ci.org/joost-de-vries/sbt-typescript)
 [![Maven Artifact](https://img.shields.io/maven-central/v/com.github.platypii/sbt-typescript.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
-[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
 Leverages the functionality of com.typesafe.sbt:js-engine to run the typescript compiler.
 
 ### Configuration
 
-Create a `tsconfig.json` file in the root of your project with the required [compiler options](http://www.typescriptlang.org/docs/handbook/compiler-options.html).
+Create a `tsconfig.json` file in the root of your project with the required [compiler options](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
 
 The following `tsc` compiler options are managed by `sbt-typescript` so setting them in `tsconfig.json` has no effect: `outDir`, `rootDirs`, `paths`, `baseUrl`, `typeRoots`. If you use the `stage` compile mode the `outFile` option is also managed by `sbt-typescript`.
 
@@ -35,12 +34,12 @@ Add the following line to your `project\plugins.sbt`:
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
 
     lazy val root = (project in file(".")).enablePlugins(SbtWeb)
-    
+
 There are several Javascript engines you can use for the build. The fastest is NodeJs. So make sure you have a recent NodeJs installed and add to `build.sbt`
 
     JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
 
-NPM libraries are used as standard sbt dependencies (jar files). Add your typescript libraries as dependencies as follows. If the library doesn't include typescript definitions add them too.  
+NPM libraries are used as standard sbt dependencies (jar files). Add your typescript libraries as dependencies as follows. If the library doesn't include typescript definitions add them too.
 ```scala
 resolvers += Resolver.bintrayRepo("webjars","maven")
 libraryDependencies ++= Seq(
@@ -48,7 +47,7 @@ libraryDependencies ++= Seq(
     "org.webjars.npm" % "types__react" % "15.0.34"
 )
  ```
-These NPM dependencies are resolved through [Webjars](http://webjars.org). Check whether the versions of the NPM packages you need are available there. If not you can add them yourself. Since we added the webjars resolver they'll be available immediately. Otherwise you'd have to wait a while before being able to use them. NB NPM package names like `@angular/code` and `@types/react` are a bit different in webjars: `angular__react` and `types__react`. 
+These NPM dependencies are resolved through [WebJars](https://www.webjars.org/). Check whether the versions of the NPM packages you need are available there. If not you can add them yourself. Since we added the webjars resolver they'll be available immediately. Otherwise you'd have to wait a while before being able to use them. NB NPM package names like `@angular/code` and `@types/react` are a bit different in webjars: `angular__react` and `types__react`.
 Add the following to `build.sbt` to resolve against those npms.
 
     resolveFromWebjarsNodeModulesDir := true
@@ -70,16 +69,16 @@ Sometimes it can be helpful to compile your project directly through the TypeScr
     project/target/node-modules/webjars/typescript/bin/tsc -p . -w
 Make sure to set the executable bit if necessary.
 For this kind of compilation to work you have to fill in the settings in `tsconfig.json` that `sbt-typescript` normally manages. See the [Angular2 demo project](https://github.com/joost-de-vries/play-angular-typescript.g8/blob/master/src/main/g8/tsconfig.json) for an example.
-    
+
 #### Compiling to a single js file
-You can develop using individual javascript files when running `sbt ~run` in Play and have your whole typescript application concatenated into a single javascript output file for your stage environment without changes to your sources. To do that you have to add a `-DtsCompileMode=stage` parameter to the sbt task in your CI that creates the stage app. So for Play that will often be `sbt stage -DtsCompileMode=stage`.  
-    
+You can develop using individual javascript files when running `sbt ~run` in Play and have your whole typescript application concatenated into a single javascript output file for your stage environment without changes to your sources. To do that you have to add a `-DtsCompileMode=stage` parameter to the sbt task in your CI that creates the stage app. So for Play that will often be `sbt stage -DtsCompileMode=stage`.
+
 
 #### import modules without type information
 If you are importing modules for which you don't have the typings you can ignore the TS2307 `can not find module` error:
 
     tsCodesToIgnore := List(canNotFindModule)
-    
+
 
 ## release notes
 
@@ -134,7 +133,7 @@ If you are importing modules for which you don't have the typings you can ignore
 - [fixes running on Trireme](https://github.com/joost-de-vries/sbt-typescript/issues/19) Tx [VeryBueno](https://github.com/VeryBueno)!
 
 #### v0.4.0-alfa.1
-- supports multi project builds. Uses sbt-web webModules for js deps resolution instead of nodeModules. 
+- supports multi project builds. Uses sbt-web webModules for js deps resolution instead of nodeModules.
 Hence the alfa moniker to see whether f.i. @types resolution still works.
 
 #### v0.3.0-beta.9
@@ -155,19 +154,18 @@ Hence the alfa moniker to see whether f.i. @types resolution still works.
 - upgrades to typescript 2.0.6
 
 #### v0.3.0-beta.5
-- solves an issue (#9) where RxJs would cause a nullpointer. 
+- solves an issue (#9) where RxJs would cause a nullpointer.
 - uses typescript 2.0.3
 
 #### v0.3.0-beta.4
-- solves an issue (#9) where RxJs would be extracted to the wrong directory. 
-
+- solves an issue (#9) where RxJs would be extracted to the wrong directory.
 #### v0.3.0-beta.3
 - uses typescript 2.0 RC (npm 2.0.2)
 
 #### v0.3.0-beta.2
 - uses typescript 2.0 beta (npm 2.0.0)
 
-#### v0.3.0SNAPSHOT 
+#### v0.3.0SNAPSHOT
 - uses standard typescript functionality to resolve against webjars. Instead of the previous custom rolled module resolution extension.
 - uses a snapshot of the upcoming typescript 2.0
 - add output assertion options
@@ -188,7 +186,7 @@ Hence the alfa moniker to see whether f.i. @types resolution still works.
 - upgrades to typescript 1.8.7
 - adds support for tests in typescript
 
-#### v0.2.2 
+#### v0.2.2
 - upgrades to typescript 1.8.2
 - improves output of single outfile
 - fixes a nasty bug in module resolution. This is essential for angular2 applications.
