@@ -82,6 +82,9 @@ If you are importing modules for which you don't have the typings you can ignore
 
 ## release notes
 
+#### v3.9.2
+- upgrade typescript to v3.9.2
+
 #### v3.8.3
 - upgrade typescript to v3.8.3
 

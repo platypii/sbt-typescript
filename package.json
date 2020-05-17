@@ -5,12 +5,12 @@
     "clean": "rimraf src/main/resources"
   },
   "dependencies": {
-    "fs-extra": "^8.1.0"
+    "fs-extra": "^9.0.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "8.0.0",
-    "@types/node": "^12.7.1",
-    "typescript": "3.8.3",
+    "@types/fs-extra": "9.0.0",
+    "@types/node": "^14.0.1",
+    "typescript": "3.9.2",
     "rimraf": "^2.7.0"
   }
 }

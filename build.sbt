@@ -1,15 +1,16 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "3.8.3"
+version := "3.9.2"
 
+// Scala needs to match sbt
 scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
   case Some((0, 13)) => "2.10.6"
   case Some((1, _))  => "2.12.8"
   case _             => sys error s"Unhandled sbt version ${sbtCrossVersion.value}"
 })
 
-crossSbtVersions := Seq("1.3.8")
+crossSbtVersions := Seq("1.3.10")
 
 val sbtCrossVersion = sbtVersion in pluginCrossBuild
 
@@ -28,7 +29,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
 
   // js dependencies
-  "org.webjars.npm" % "typescript" % "3.8.3",
+  "org.webjars.npm" % "typescript" % "3.9.2",
   "org.webjars.npm" % "minimatch" % "3.0.4",
   "org.webjars.npm" % "fs-extra" % "8.1.0",
   "org.webjars.npm" % "es6-shim" % "0.35.5"
