@@ -1,0 +1,14 @@
+
+variables:
+  SBT_OPTS: -Duser.home=dep-cache
+
+test:
+  image: baselinews/builder
+  script:
+    - sbt "scripted sbt-typescript/ignoreCanNotFindModule"
+    - sbt "scripted sbt-typescript/inlinesourcemap"
+    - sbt "scripted sbt-typescript/sourcemap"
+  cache:
+    key: ivy-deps
+    paths:
+    - dep-cache
