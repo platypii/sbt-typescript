@@ -1,6 +1,6 @@
 package com.platypii.typescript
 
-import spray.json.{JsArray, JsString, _}
+import spray.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString}
 
 object JsonUtil {
   def merge(tsConfig: JsObject, tsConfigOverride: JsObject): JsObject = {
@@ -22,7 +22,6 @@ object JsonUtil {
         }
 
       }).orElse(tsConfig.getFields(key).headOption.map(key -> _)).orElse(tsConfigOverride.getFields(key).headOption.map(key -> _))
-
     }
     new JsObject(merged.flatten.toMap)
   }

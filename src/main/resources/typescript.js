@@ -4,21 +4,27 @@ require("es6-shim");
 var Logger = (function () {
     function Logger(logLevel) {
         this.logLevel = logLevel;
-        this.isDebug = "debug" === this.logLevel;
+        this.isDebug = logLevel === "debug";
     }
     Logger.prototype.debug = function (message, object) {
-        if (this.logLevel === "debug" && object)
-            console.log(message, object);
-        else if (this.logLevel === "debug")
-            console.log(message);
+        if (this.logLevel === "debug") {
+            if (object) {
+                console.log(message, object);
+            }
+            else {
+                console.log(message);
+            }
+        }
     };
     Logger.prototype.info = function (message) {
-        if (this.logLevel === "debug" || this.logLevel === "debug")
+        if (this.logLevel === "debug" || this.logLevel === "info") {
             console.log(message);
+        }
     };
     Logger.prototype.warn = function (message) {
-        if (this.logLevel === "debug" || this.logLevel === "info" || this.logLevel === "warn")
+        if (this.logLevel === "debug" || this.logLevel === "info" || this.logLevel === "warn") {
             console.log(message);
+        }
     };
     Logger.prototype.error = function (message, error) {
         if (this.logLevel === "debug" || this.logLevel === "info" || this.logLevel === "warn" || this.logLevel === "error") {
@@ -117,9 +123,9 @@ function parseArgs(args) {
     }
     catch (e) {
         sourceFileMappings = [[
-            path.join(cwd, args[SOURCE_FILE_MAPPINGS_ARG]),
-            args[SOURCE_FILE_MAPPINGS_ARG]
-        ]];
+                path.join(cwd, args[SOURCE_FILE_MAPPINGS_ARG]),
+                args[SOURCE_FILE_MAPPINGS_ARG]
+            ]];
     }
     var target = (args.length > TARGET_ARG ? args[TARGET_ARG] : path.join(cwd, "lib"));
     var options;
@@ -185,12 +191,11 @@ function compile(sourceMaps, sbtOptions, target) {
         var emitOutput_1 = program.emit();
         var moveTestPromise = sbtOptions.assetsDirs.length === 2 ? moveEmittedTestAssets(sbtOptions) : Promise.resolve({});
         moveTestPromise
-            .then(function (value) {
+            .then(function () {
             if (sbtOptions.assertCompilation) {
                 logAndAssertEmitted(results, emitOutput_1);
             }
-        }, function (e) {
-        });
+        }, function () { });
         problems.push.apply(problems, toProblems(emitOutput_1.diagnostics, sbtOptions.tsCodesToIgnore));
         if (logger.isDebug) {
             var declarationFiles = program.getSourceFiles().filter(isDeclarationFile);
@@ -203,14 +208,13 @@ function compile(sourceMaps, sbtOptions, target) {
             results = [];
         }
     }
-    var output = {
+    return {
         results: results,
         problems: problems
     };
-    return output;
     function logAndAssertEmitted(declaredResults, emitOutput) {
         var ffw = flatFilesWritten(declaredResults);
-        var emitted = emitOutput.emitSkipped ? [] : emitOutput.emittedFiles;
+        var emitted = emitOutput.emitSkipped ? [] : emitOutput.emittedFiles || [];
         logger.debug("files written", ffw);
         logger.debug("files emitted", emitted);
         var emittedButNotDeclared = minus(emitted, ffw);
@@ -235,7 +239,7 @@ function compile(sourceMaps, sbtOptions, target) {
             var r = [];
             for (var _i = 0, arr1_1 = arr1; _i < arr1_1.length; _i++) {
                 var s = arr1_1[_i];
-                if (arr2.indexOf(s) == -1) {
+                if (arr2.indexOf(s) === -1) {
                     r.push(s);
                 }
             }
@@ -247,7 +251,6 @@ function compile(sourceMaps, sbtOptions, target) {
         var relPathAssets = sbtOpts.assetsDirs[0].substring(common.length);
         var relPathTestAssets = sbtOpts.assetsDirs[1].substring(common.length);
         var sourcePath = path.join(target, relPathTestAssets);
-        var moveMsg = sourcePath + " to " + target;
         return Promise.all([remove(path.join(target, relPathAssets)), move(sourcePath, target)]);
     }
     function remove(dir) {
@@ -286,7 +289,7 @@ function compile(sourceMaps, sbtOptions, target) {
     function notExistingFiles(filesDeclared) {
         return Promise.all(filesDeclared.map(exists))
             .then(function (e) {
-            var r = e.filter(function (a) {
+            return e.filter(function (a) {
                 var s = a[0], exist = a[1];
                 return !exist;
             })
@@ -294,7 +297,6 @@ function compile(sourceMaps, sbtOptions, target) {
                 var s = a[0], b = a[1];
                 return s;
             });
-            return r;
         });
         function exists(file) {
             return new Promise(function (resolve, reject) {
@@ -335,10 +337,10 @@ function compile(sourceMaps, sbtOptions, target) {
             logger.debug("single outFile ", outFile);
             unparsedCompilerOptions.outFile = outFile;
         }
-        if (sbtOptions.assetsDirs.length == 2) {
+        if (sbtOptions.assetsDirs.length === 2) {
             unparsedCompilerOptions.rootDirs = sbtOptions.assetsDirs;
         }
-        else if (sbtOptions.assetsDirs.length == 1) {
+        else if (sbtOptions.assetsDirs.length === 1) {
             unparsedCompilerOptions.rootDir = sbtOptions.assetsDirs[0];
         }
         else {
@@ -382,14 +384,13 @@ function toCompilationResult(sourceMappings, compilerOptions) {
                 var outputFileMap = outputFile + ".map";
                 filesWritten.push(outputFileMap);
             }
-            var result = {
+            return {
                 source: sourceFile.fileName,
                 result: {
                     filesRead: deps,
                     filesWritten: filesWritten
                 }
             };
-            return result;
             function determineOutFile(outFile, options) {
                 if (options.outFile) {
                     logger.debug("single outFile ", options.outFile);
@@ -429,7 +430,7 @@ function parseDiagnostic(d) {
         lineText = d.file.text.substring(lineStart, lineEnd);
         fileName = d.file.fileName;
     }
-    var problem = {
+    return {
         lineNumber: lineCol.line + 1,
         characterOffset: lineCol.character,
         message: "TS" + d.code + " " + typescript_1.flattenDiagnosticMessageText(d.messageText, typescript_1.sys.newLine),
@@ -437,7 +438,6 @@ function parseDiagnostic(d) {
         severity: toSeverity(d.category),
         lineContent: lineText
     };
-    return problem;
     function toSeverity(i) {
         if (i === 0) {
             return "warn";

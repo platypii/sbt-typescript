@@ -1,37 +1,16 @@
 {
   "rules": {
-    "no-empty": true,
-    "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
-    "indent": [
-      true,
-      "spaces"
-    ],
+    "no-empty": false,
+    "indent": [true, "spaces"],
+    "max-classes-per-file": false,
     "no-duplicate-variable": true,
-    "no-eval": true,
-    "no-internal-module": true,
-    "no-trailing-whitespace": true,
-    "no-var-keyword": true,
     "one-line": [
       true,
       "check-open-brace",
       "check-whitespace"
     ],
-    "quotemark": [
-      true,
-      "double"
-    ],
-    "semicolon": [
-      true,
-      "never"
-    ],
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
+    "quotemark": [true, "double"],
+    "semicolon": [true, "never"],
     "typedef-whitespace": [
       true,
       {
@@ -41,18 +20,6 @@
         "property-declaration": "nospace",
         "variable-declaration": "nospace"
       }
-    ],
-    "variable-name": [
-      true,
-      "ban-keywords"
-    ],
-    "whitespace": [
-      false,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-separator",
-      "check-type"
     ]
   }
 }

@@ -24,6 +24,7 @@
     "strictNullChecks": true
   },
   "exclude": [
+    "example",
     "node_modules",
     "test",
     "src/sbt-test"
