@@ -3,58 +3,6 @@
 const path = require("path")
 require("es6-shim")
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
-
-// tslint:disable:no-console
-class Logger {
-  public readonly logLevel: LogLevel
-  public readonly isDebug: boolean
-
-  constructor(logLevel: LogLevel) {
-    this.logLevel = logLevel
-    this.isDebug = logLevel === "debug"
-  }
-
-  debug(message: string, object?: any) {
-    if (this.logLevel === "debug") {
-      if (object) {
-        console.log(message, object)
-      } else {
-        console.log(message)
-      }
-    }
-  }
-
-  info(message: string) {
-    if (this.logLevel === "debug" || this.logLevel === "info") {
-      console.log(message)
-    }
-  }
-
-  warn(message: string) {
-    if (this.logLevel === "debug" || this.logLevel === "info" || this.logLevel === "warn") {
-      console.log(message)
-    }
-  }
-
-  error(message: string, error?: any) {
-    if (this.logLevel === "debug" || this.logLevel === "info" || this.logLevel === "warn" || this.logLevel === "error") {
-      if (error !== undefined) {
-        let errorMessage = error.message
-        if (error.fileName !== undefined) {
-          errorMessage = errorMessage + " in " + error.fileName
-        }
-        if (error.lineNumber !== undefined) {
-          errorMessage = errorMessage + " at line " + error.lineNumber
-        }
-        console.log(message + " " + errorMessage)
-      } else {
-        console.log(message)
-      }
-    }
-  }
-}
-
 interface Option<T> {
   value?: T
   foreach(f: (t: T) => any): any
@@ -146,24 +94,10 @@ interface CompilationFileResult {
   }
 }
 
-interface CompilationResult {
-  results: CompilationFileResult[]
-  problems: Problem[]
-}
-
 function compileDone(compileResult: CompilationResult) {
   // datalink escape character https://en.wikipedia.org/wiki/C0_and_C1_control_codes#DLE
   // used to signal result of compilation see https://github.com/sbt/sbt-js-engine/blob/master/src/main/scala/com/typesafe/sbt/jse/SbtJsTask.scala
   console.log("\u0010" + JSON.stringify(compileResult))
-}
-
-interface Problem {
-  lineNumber: number
-  characterOffset: number
-  message: string
-  source: string
-  severity: string
-  lineContent: string
 }
 
 /** interfacing with sbt */

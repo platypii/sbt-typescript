@@ -14,7 +14,7 @@ crossSbtVersions := Seq("1.3.10")
 
 val sbtCrossVersion = sbtVersion in pluginCrossBuild
 
-updateOptions := updateOptions.value.withCachedResolution(cachedResoluton = true)
+updateOptions := updateOptions.value.withCachedResolution(true)
 
 scalacOptions ++= Seq(
   "-feature",

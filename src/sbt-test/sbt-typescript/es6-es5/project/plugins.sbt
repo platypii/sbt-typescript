@@ -7,4 +7,3 @@ resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.typesafeRepo("releases")
 )
-

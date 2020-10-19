@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "commonjs", // amd?
     "moduleResolution": "node",
     "removeComments": true,
     "sourceMap": false,
@@ -21,7 +21,8 @@
     "noFallthroughCasesInSwitch":true,
     "preserveConstEnums": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    // "outFile": "src/main/resources/typescript.js"
   },
   "exclude": [
     "example",

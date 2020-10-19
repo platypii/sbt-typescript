@@ -1,8 +1,8 @@
 # sbt-typescript
 
 [![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.org/joost-de-vries/sbt-typescript.png?branch=master)](https://travis-ci.org/joost-de-vries/sbt-typescript)
-[![Maven Artifact](https://img.shields.io/maven-central/v/com.github.platypii/sbt-typescript.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
+[![Build Status](https://gitlab.com/baselinews/sbt-typescript/badges/master/pipeline.svg)](https://gitlab.com/baselinews/sbt-typescript)
+[![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
 
 This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
 Leverages the functionality of com.typesafe.sbt:js-engine to run the typescript compiler.
