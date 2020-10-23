@@ -1,9 +1,8 @@
-
-variables:
-  SBT_OPTS: -Duser.home=dep-cache
+default:
+  image: baselinews/builder
 
 test:
-  image: baselinews/builder
+  stage: test
   script:
     # - sbt "scripted sbt-typescript/angular2"
     - sbt "scripted sbt-typescript/atTypes"
@@ -14,7 +13,10 @@ test:
     - sbt "scripted sbt-typescript/sourcemap"
     # - sbt "scripted sbt-typescript/stage"
     # - sbt "scripted sbt-typescript/testassets"
-  cache:
-    key: ivy-deps
-    paths:
-    - dep-cache
+
+typescript:
+  stage: test
+  script:
+    - npm i
+    - ./node_modules/typescript/bin/tsc
+    - ./node_modules/tslint/bin/tslint --project .
