@@ -1,3 +1,4 @@
+///<reference path="sbt-ts.d.ts"/>
 
 /** this file contains code that has no dependencies on external modules */
 const path = require("path")
@@ -141,18 +142,6 @@ interface Args {
   sourceFileMappings: string[][]
   target: string
   options: SbtTypescriptOptions
-}
-
-interface SbtTypescriptOptions {
-  logLevel: LogLevel,
-  tsconfig: any,
-  tsconfigDir: string,
-  assetsDirs: string[],
-  tsCodesToIgnore: number[],
-  extraFiles: string[],
-  nodeModulesDirs: string[],
-  resolveFromNodeModulesDir: boolean,
-  assertCompilation: boolean
 }
 
 function replaceFileExtension(file: string, ext: string) {

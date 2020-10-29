@@ -1,4 +1,5 @@
 /* global process, require */
+/// <reference path="logger.ts" />
 /// <reference path="./internal.ts" />
 import {
   CompilerOptions,
@@ -14,6 +15,7 @@ import {
   flattenDiagnosticMessageText,
   sys
 } from "typescript"
+import { Logger } from "./logger"
 import * as fs from "fs-extra"
 
 const args: Args = parseArgs(process.argv)

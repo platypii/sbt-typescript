@@ -11,7 +11,9 @@ import sbt.Keys._
 import sbt.{Def, _}
 import spray.json.{JsArray, JsBoolean, JsNumber, JsObject, JsString, JsValue, JsonParser}
 
-/** typescript compilation can run during 'sbt assets' compilation or during Play 'sbt stage' as a sbt-web pipe */
+/**
+  * Typescript compilation can run during 'sbt assets' compilation or during Play 'sbt stage' as a sbt-web pipe
+  */
 sealed class CompileMode(val value: String) {
   override def toString: String = value
 }
@@ -32,33 +34,53 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
 
   override def trigger = AllRequirements
 
-  /** the public api to a projects build.sbt */
+  /**
+    * The public api to a projects build.sbt
+    */
   object autoImport {
     val typescript = TaskKey[Seq[File]]("typescript", "Run Typescript compiler")
 
-    val projectFile = SettingKey[File]("typescript-projectfile",
-      "The location of the tsconfig.json  Default: <basedir>/tsconfig.json")
+    val projectFile =
+      SettingKey[File]("typescript-projectfile", "The location of the tsconfig.json  Default: <basedir>/tsconfig.json")
 
-    val projectTestFile = SettingKey[Option[String]]("typescript-test-projectfile",
-      "The location of the tsconfig.json for test code.  For instance: <basedir>/tsconfig.test.json")
+    val projectTestFile = SettingKey[Option[String]](
+      "typescript-test-projectfile",
+      "The location of the tsconfig.json for test code.  For instance: <basedir>/tsconfig.test.json"
+    )
 
-    val typingsFile = SettingKey[Option[File]]("typescript-typings-file", "A file that refers to typings that the build needs. Default None.")
+    val typingsFile = SettingKey[Option[File]](
+      "typescript-typings-file",
+      "A file that refers to typings that the build needs. Default None."
+    )
 
-    val tsCodesToIgnore = SettingKey[List[Int]]("typescript-codes-to-ignore",
-      "The tsc error codes (f.i. TS2307) to ignore. Default empty list.")
+    val tsCodesToIgnore = SettingKey[List[Int]](
+      "typescript-codes-to-ignore",
+      "The tsc error codes (f.i. TS2307) to ignore. Default empty list."
+    )
 
-    val canNotFindModule = 2307 //see f.i. https://github.com/Microsoft/TypeScript/issues/3808
+    val canNotFindModule = 2307 // see f.i. https://github.com/Microsoft/TypeScript/issues/3808
 
-    val resolveFromWebjarsNodeModulesDir = SettingKey[Boolean]("typescript-resolve-modules-from-etc", "Will use the directory to resolve modules ")
+    val resolveFromWebjarsNodeModulesDir =
+      SettingKey[Boolean]("typescript-resolve-modules-from-etc", "Will use the directory to resolve modules ")
 
     val typescriptPipe = Def.taskKey[Pipeline.Stage]("typescript-pipe")
-    val outFile = SettingKey[String]("typescript-out-file", "the name of the outfile that the stage pipe will produce. Default 'main.js' ")
+    val outFile = SettingKey[String](
+      "typescript-out-file",
+      "the name of the outfile that the stage pipe will produce. Default 'main.js' "
+    )
 
-    val compileMode = SettingKey[CompileMode]("typescript-compile-mode", "the compile mode to use if no jvm argument is provided. Default 'Compile'")
+    val compileMode = SettingKey[CompileMode](
+      "typescript-compile-mode",
+      "the compile mode to use if no jvm argument is provided. Default 'Compile'"
+    )
 
-    val setupTscCompilation = TaskKey[Unit]("setup-tsc-compilation", "Setup tsc compilation. For example to get your IDE to compile typescript.")
+    val setupTscCompilation = TaskKey[Unit](
+      "setup-tsc-compilation",
+      "Setup tsc compilation. For example to get your IDE to compile typescript."
+    )
 
-    val assertCompilation = SettingKey[Boolean]("typescript-asserts", "for debugging purposes: asserts that tsc produces the expected files")
+    val assertCompilation =
+      SettingKey[Boolean]("typescript-asserts", "for debugging purposes: asserts that tsc produces the expected files")
 
   }
 
@@ -75,41 +97,44 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
     )
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    // default settings
-    tsCodesToIgnore := List.empty[Int],
-    projectFile := baseDirectory.value / "tsconfig.json",
-    projectTestFile := None, //baseDirectory.value / "tsconfig.test.json",
-    typingsFile := None,
-    resolveFromWebjarsNodeModulesDir := false,
-    logLevel in typescript := Level.Info,
-    typescriptPipe := typescriptPipeTask.value,
-    JsEngineKeys.parallelism := 1,
-    compileMode := CompileMode.Compile,
-    getCompileMode := getCompileModeTask.value,
-    outFile := "main.js",
-    setupTscCompilation := setupTsCompilationTask().value,
-    assertCompilation := false
-  ) ++ inTask(typescript)(
-    SbtJsTask.jsTaskSpecificUnscopedProjectSettings ++
-      inConfig(Assets)(typescriptUnscopedSettings(Assets)) ++
-      inConfig(TestAssets)(typescriptUnscopedSettings(TestAssets)) ++
-      Seq(
-        taskMessage in Assets := "Typescript compiling",
-        taskMessage in TestAssets := "Typescript test compiling"
-      )
-  ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
-    typescript in Assets := (typescript in Assets).dependsOn(webJarsNodeModules in Assets).value,
-    typescript in TestAssets := (typescript in TestAssets).dependsOn(webJarsNodeModules in TestAssets).value
-  )
+  override def projectSettings: Seq[Setting[_]] =
+    Seq(
+      // default settings
+      tsCodesToIgnore := List.empty[Int],
+      projectFile := baseDirectory.value / "tsconfig.json",
+      projectTestFile := None, // baseDirectory.value / "tsconfig.test.json",
+      typingsFile := None,
+      resolveFromWebjarsNodeModulesDir := false,
+      logLevel in typescript := Level.Info,
+      typescriptPipe := typescriptPipeTask.value,
+      JsEngineKeys.parallelism := 1,
+      compileMode := CompileMode.Compile,
+      getCompileMode := getCompileModeTask.value,
+      outFile := "main.js",
+      setupTscCompilation := setupTsCompilationTask().value,
+      assertCompilation := false
+    ) ++ inTask(typescript)(
+      SbtJsTask.jsTaskSpecificUnscopedProjectSettings ++
+        inConfig(Assets)(typescriptUnscopedSettings(Assets)) ++
+        inConfig(TestAssets)(typescriptUnscopedSettings(TestAssets)) ++
+        Seq(
+          taskMessage in Assets := "Typescript compiling",
+          taskMessage in TestAssets := "Typescript test compiling"
+        )
+    ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
+      typescript in Assets := (typescript in Assets).dependsOn(webJarsNodeModules in Assets).value,
+      typescript in TestAssets := (typescript in TestAssets).dependsOn(webJarsNodeModules in TestAssets).value
+    )
 
   def typescriptUnscopedSettings(config: Configuration): Seq[Setting[_]] = {
 
     def optionalFields(m: Map[String, Option[JsValue]]): Map[String, JsValue] = {
-      m.flatMap { case (s, oj) => oj match {
-        case None => Map.empty[String, JsValue]
-        case Some(jsValue) => Map(s -> jsValue)
-      }
+      m.flatMap {
+        case (s, oj) =>
+          oj match {
+            case None => Map.empty[String, JsValue]
+            case Some(jsValue) => Map(s -> jsValue)
+          }
       }
     }
 
@@ -127,25 +152,28 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
       includeFilter := GlobFilter("*.ts") | GlobFilter("*.tsx"),
       excludeFilter := GlobFilter("*.d.ts"),
       // the options that we provide to our js task
-      jsOptions := JsObject(Map(
-        "logLevel" -> JsString(logLevel.value.toString),
-        "tsconfig" -> parseTsConfig().value,
-        "tsconfigDir" -> JsString(projectFile.value.getParent),
-        "assetsDirs" -> toJsArray(
-          mainDir = (sourceDirectory in Assets).value.getAbsolutePath,
-          testDir = (sourceDirectory in TestAssets).value.getAbsolutePath
-        ),
-        "tsCodesToIgnore" -> JsArray(tsCodesToIgnore.value.toVector.map(JsNumber(_))),
-        "nodeModulesDirs" -> toJsArray(
-          mainDir = (webJarsNodeModulesDirectory in Assets).value.getAbsolutePath,
-          testDir = (webJarsNodeModulesDirectory in TestAssets).value.getAbsolutePath),
-        "resolveFromNodeModulesDir" -> JsBoolean(resolveFromWebjarsNodeModulesDir.value),
-        "runMode" -> JsString(getCompileMode.value.toString),
-        "assertCompilation" -> JsBoolean(assertCompilation.value)
-      ) ++ optionalFields(Map(
-        "extraFiles" -> typingsFile.value.map(tf => JsArray(JsString(tf.getCanonicalPath)))
-      )
-      )
+      jsOptions := JsObject(
+        Map(
+          "logLevel" -> JsString(logLevel.value.toString),
+          "tsconfig" -> parseTsConfig().value,
+          "tsconfigDir" -> JsString(projectFile.value.getParent),
+          "assetsDirs" -> toJsArray(
+            mainDir = (sourceDirectory in Assets).value.getAbsolutePath,
+            testDir = (sourceDirectory in TestAssets).value.getAbsolutePath
+          ),
+          "tsCodesToIgnore" -> JsArray(tsCodesToIgnore.value.toVector.map(JsNumber(_))),
+          "nodeModulesDirs" -> toJsArray(
+            mainDir = (webJarsNodeModulesDirectory in Assets).value.getAbsolutePath,
+            testDir = (webJarsNodeModulesDirectory in TestAssets).value.getAbsolutePath
+          ),
+          "resolveFromNodeModulesDir" -> JsBoolean(resolveFromWebjarsNodeModulesDir.value),
+          "runMode" -> JsString(getCompileMode.value.toString),
+          "assertCompilation" -> JsBoolean(assertCompilation.value)
+        ) ++ optionalFields(
+          Map(
+            "extraFiles" -> typingsFile.value.map(tf => JsArray(JsString(tf.getCanonicalPath)))
+          )
+        )
       ).toString()
     )
   }
@@ -173,16 +201,18 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
     ()
   }
 
-  /** parse our tsconfig.json and replace the properties that we manage. Ie outDir viz outFile */
+  /**
+    * Parse tsconfig.json and replace the properties that we manage. Ie outDir viz outFile
+    */
   def parseTsConfig(): Def.Initialize[Task[JsObject]] = Def.task {
 
-    def removeComments(string: String): String = {
-      JsonCleaner.minify(string)
-    }
-
+    /**
+      * Remove comments and then parse tsconfig.json
+      */
     def parseJson(tsConfigFile: File): JsValue = {
       val content = IO.read(tsConfigFile)
-      JsonParser(removeComments(content))
+      val noComment = JsonCleaner.minify(content)
+      JsonParser(noComment)
     }
 
     def fixJson(tsConfigFile: File): JsObject = {
@@ -200,7 +230,8 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
     val testTsConfigOverrides = projectTestFile.value
       .map(fileName => baseDirectory.value / fileName)
       .map(file => parseJson(file).asJsObject)
-    testTsConfigOverrides.map(overrides => JsonUtil.merge(defaultTsConfig, overrides))
+    testTsConfigOverrides
+      .map(overrides => JsonUtil.merge(defaultTsConfig, overrides))
       .getOrElse(defaultTsConfig)
   }
 

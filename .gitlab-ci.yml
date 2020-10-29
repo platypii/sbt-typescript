@@ -14,6 +14,11 @@ test:
     # - sbt "scripted sbt-typescript/stage"
     # - sbt "scripted sbt-typescript/testassets"
 
+scalafmt:
+  stage: test
+  script:
+    - sbt scalafmtCheckAll
+
 typescript:
   stage: test
   script:

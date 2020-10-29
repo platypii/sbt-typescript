@@ -3,12 +3,12 @@ package com.platypii.typescript
 import java.util.regex.{Matcher, Pattern}
 
 /**
- * Minify.java
- * jsonminifier - Ported from https://github.com/getify/JSON.minify
- *
- * Created by Bernhard Gass on 8/01/13.
- * Copyright © 2013 Bernhard Gass. All rights reserved.
- */
+  * Minify.java
+  * jsonminifier - Ported from https://github.com/getify/JSON.minify
+  *
+  * Created by Bernhard Gass on 8/01/13.
+  * Copyright © 2013 Bernhard Gass. All rights reserved.
+  */
 object JsonCleaner {
 
   private val TOKENIZER = "\"|(/\\*)|(\\*/)|(//)|\\n|\\r"
@@ -17,9 +17,9 @@ object JsonCleaner {
   private val MAGIC_PATTERN = Pattern.compile(MAGIC)
 
   /**
-   * @param json a json object with comments
-   * @return a compact json object with comments stripped out
-   */
+    * @param json a json object with comments
+    * @return a compact json object with comments stripped out
+    */
   def minify(json: CharSequence): String = {
     if (json == null)
       throw new IllegalArgumentException("Parameter 'json' cannot be null.")

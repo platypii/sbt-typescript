@@ -2,7 +2,7 @@
 type LogLevel = "debug" | "info" | "warn" | "error"
 
 // tslint:disable:no-console
-class Logger {
+export class Logger {
   public readonly logLevel: LogLevel
   public readonly isDebug: boolean
 

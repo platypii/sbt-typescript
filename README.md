@@ -12,7 +12,7 @@ Leverages the functionality of com.typesafe.sbt:js-engine to run the typescript 
 Add the following line to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.0.3")
+addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.0.5")
 ```
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
