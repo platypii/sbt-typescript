@@ -12,6 +12,7 @@
       "*": [
         "*",
         "target/web/node-modules/main/webjars/fs-extra/*",
+        "target/web/node-modules/main/webjars/@types/node/",
         "node_modules/@types/node/*"
       ]
     },

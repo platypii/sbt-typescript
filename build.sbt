@@ -3,18 +3,7 @@ organization := "com.github.platypii"
 name := "sbt-typescript"
 version := "4.1.3-SNAPSHOT"
 
-// Scala needs to match sbt
-scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
-  case Some((0, 13)) => "2.10.6"
-  case Some((1, _))  => "2.12.8"
-  case _             => sys error s"Unhandled sbt version ${sbtCrossVersion.value}"
-})
-
-crossSbtVersions := Seq("1.3.10")
-
-val sbtCrossVersion = sbtVersion in pluginCrossBuild
-
-updateOptions := updateOptions.value.withCachedResolution(true)
+scalaVersion := "2.12.12"
 
 scalacOptions ++= Seq(
   "-feature",
@@ -26,17 +15,20 @@ scalacOptions ++= Seq(
   "-Ywarn-adapted-args"
 )
 
+// Enable SbtWeb to bundle assets
+lazy val root = (project in file(".")).enablePlugins(SbtWeb)
+enablePlugins(SbtPlugin)
+
 libraryDependencies ++= Seq(
   "io.spray" %% "spray-json" % "1.3.6",
   "com.typesafe" %% "jse" % "1.2.4", // TODO: Remove me
 
   // js dependencies
   "org.webjars.npm" % "typescript" % "4.1.2",
-  // Used by ...?
   "org.webjars.npm" % "fs-extra" % "9.0.1",
-  "org.webjars.npm" % "es6-shim" % "0.35.6",
-  // "org.webjars.npm" % "types__fs-extra" % "9.0.2",
-  // "org.webjars.npm" % "types__node" % "14.14.6"
+  // Used by ...?
+  "org.webjars.npm" % "types__fs-extra" % "9.0.2",
+  "org.webjars.npm" % "types__node" % "14.14.6"
 )
 
 resolvers ++= Seq(
@@ -49,10 +41,17 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
 
-enablePlugins(SbtPlugin)
+// Needed to get js into root of jar
+publishMavenStyle := true
+resourceDirectory in Compile := baseDirectory.value / "target" / "sbt-typescript"
+publish := publish.dependsOn(typescript in Assets).map((u) => u).value
+publishLocal := publishLocal.dependsOn(typescript in Assets).map((u) => u).value
 
-// Enable SbtWeb to bundle assets
-enablePlugins(SbtWeb)
+// For Arp
+import com.arpnetworking.sbt.typescript.Import.TypescriptKeys._
+configFile := "tsconfig.json"
+
+typescript / logLevel := Level.Debug
 
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")
 scriptedBufferLog := false
