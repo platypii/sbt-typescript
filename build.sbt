@@ -35,6 +35,8 @@ libraryDependencies ++= Seq(
   // Used by ...?
   "org.webjars.npm" % "fs-extra" % "9.0.1",
   "org.webjars.npm" % "es6-shim" % "0.35.6",
+  // "org.webjars.npm" % "types__fs-extra" % "9.0.2",
+  // "org.webjars.npm" % "types__node" % "14.14.6"
 )
 
 resolvers ++= Seq(
@@ -48,5 +50,9 @@ resolvers ++= Seq(
 addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
 
 enablePlugins(SbtPlugin)
+
+// Enable SbtWeb to bundle assets
+enablePlugins(SbtWeb)
+
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")
 scriptedBufferLog := false

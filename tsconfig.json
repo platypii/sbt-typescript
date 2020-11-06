@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs", // amd?
+    "module": "amd",
     "moduleResolution": "node",
     "removeComments": true,
     "sourceMap": false,
-    "rootDir": "src/main/typescript",
-    "outDir": "./src/main/resources",
-    // "outFile": "src/main/resources/typescript.js",
+    "rootDir": "src/main/assets",
+    "outFile": "target/sbt-typescript/typescriptc.js",
     "baseUrl": ".",
     "paths": {
       "*": [
         "*",
+        "target/web/node-modules/main/webjars/fs-extra/*",
         "node_modules/@types/node/*"
       ]
     },
@@ -22,7 +22,11 @@
     "noFallthroughCasesInSwitch": true,
     "preserveConstEnums": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "typeRoots": [
+      "target/web/node-modules/main/webjars/@types",
+      "node_modules/@types"
+    ]
   },
   "exclude": [
     "example",

@@ -43,16 +43,16 @@ export function move(sourcePath: string, target: string): Promise<void> {
  */
 export function notExistingFiles(filesDeclared: string[]): Promise<string[]> {
   return Promise.all(filesDeclared.map(exists))
-  .then((e: [string, boolean][]) => {
-    return e.filter(a => {
-      const [s, exist] = a
-      return !exist
+    .then((e: [string, boolean][]) => {
+      return e.filter(a => {
+        const [s, exist] = a
+        return !exist
+      })
+      .map(a => {
+        const [s, b] = a
+        return s
+      })
     })
-    .map(a => {
-      const [s, b] = a
-      return s
-    })
-  })
 }
 
 function exists(file: string): Promise<[string, boolean]> {

@@ -1,4 +1,4 @@
-///<reference path="sbt-ts.d.ts"/>
+///<reference path="types/sbt-ts.d.ts"/>
 
 /** this file contains code that has no dependencies on external modules */
 const path = require("path")
