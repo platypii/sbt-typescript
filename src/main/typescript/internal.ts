@@ -87,20 +87,6 @@ class SourceMappings {
   }
 }
 
-interface CompilationFileResult {
-  source: string
-  result: {
-    filesRead: string[]
-    filesWritten: string[]
-  }
-}
-
-function compileDone(compileResult: CompilationResult) {
-  // datalink escape character https://en.wikipedia.org/wiki/C0_and_C1_control_codes#DLE
-  // used to signal result of compilation see https://github.com/sbt/sbt-js-engine/blob/master/src/main/scala/com/typesafe/sbt/jse/SbtJsTask.scala
-  console.log("\u0010" + JSON.stringify(compileResult))
-}
-
 /** interfacing with sbt */
 // from jstranspiler
 function parseArgs(args: string[]): Args {

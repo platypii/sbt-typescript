@@ -1,6 +1,8 @@
 /* global process, require */
 /// <reference path="logger.ts" />
-/// <reference path="./internal.ts" />
+/// <reference path="internal.ts" />
+/// <reference path="sbt-web.d.ts" />
+
 import {
   CompilerOptions,
   Diagnostic,
@@ -33,6 +35,12 @@ logger.debug("args " + JSON.stringify(args, null, 2))
 const compileResult = compile(sourceMappings, sbtTypescriptOpts, args.target)
 
 compileDone(compileResult)
+
+function compileDone(compileResult: CompilationResult) {
+  // datalink escape character https://en.wikipedia.org/wiki/C0_and_C1_control_codes#DLE
+  // used to signal result of compilation see https://github.com/sbt/sbt-js-engine/blob/master/src/main/scala/com/typesafe/sbt/jse/SbtJsTask.scala
+  console.log("\u0010" + JSON.stringify(compileResult))
+}
 
 function compile(sourceMaps: SourceMappings, sbtOptions: SbtTypescriptOptions, target: string): CompilationResult {
   const problems: Problem[] = []

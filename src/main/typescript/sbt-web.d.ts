@@ -12,3 +12,11 @@ interface CompilationResult {
   results: CompilationFileResult[]
   problems: Problem[]
 }
+
+interface CompilationFileResult {
+  source: string
+  result: {
+    filesRead: string[]
+    filesWritten: string[]
+  }
+}

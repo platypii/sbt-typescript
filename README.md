@@ -60,6 +60,11 @@ To be able to view the original Typescript code from your browser when developin
     "sourceRoot": "/assets",
 ```
 
+You can get more verbose logging of what sbt-typescript is doing by adding to `build.sbt`:
+```scala
+typescript / logLevel := Level.Debug
+```
+
 ### Testing
 
 To test your TypeScript code add an sbt plugin for a JS testframework. For instance [sbt-jasmine](https://github.com/joost-de-vries/sbt-jasmine) or [sbt-mocha](https://github.com/sbt/sbt-mocha). You can override `tsc` configurations for your test code. To do that create a file `tsconfig.test.json` and add to `build.sbt`
