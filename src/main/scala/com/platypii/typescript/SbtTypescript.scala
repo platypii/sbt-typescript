@@ -1,8 +1,7 @@
 package com.platypii.typescript
 
-import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
-import com.typesafe.sbt.jse.SbtJsTask
-import com.typesafe.sbt.jse.SbtJsTask.autoImport.JsTaskKeys._
+import com.platypii.typescript.JsEngineImport.JsEngineKeys
+import com.platypii.typescript.JsTaskImport.JsTaskKeys.{jsOptions, shellFile, taskMessage}
 import com.typesafe.sbt.web.Import.WebKeys._
 import com.typesafe.sbt.web.PathMapping
 import com.typesafe.sbt.web.SbtWeb.autoImport._
@@ -90,12 +89,13 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
 
   import autoImport._
 
-  override def buildSettings: Seq[Setting[_]] = inTask(typescript)(
-    SbtJsTask.jsTaskSpecificUnscopedBuildSettings ++ Seq(
-      moduleName := "typescript",
-      shellFile := getClass.getClassLoader.getResource("typescript.js")
+  override def buildSettings: Seq[Setting[_]] =
+    inTask(typescript)(
+      SbtJsTask.jsTaskSpecificUnscopedBuildSettings ++ Seq(
+        moduleName := "typescript",
+        shellFile := getClass.getClassLoader.getResource("typescript.js")
+      )
     )
-  )
 
   override def projectSettings: Seq[Setting[_]] =
     Seq(
@@ -179,82 +179,86 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
   }
 
   /** a convenience task to copy webjar npms to the standard ./node_modules directory */
-  def setupTsCompilationTask(): Def.Initialize[Task[Unit]] = Def.task {
-    def copyPairs(baseDir: File, modules: Seq[File]): Seq[(File, File)] = {
-      modules
-        .flatMap(f => IO.relativizeFile(baseDir, f).map(rf => Seq((f, rf))).getOrElse(Seq.empty))
-        .map { case (f, rf) => (f, baseDirectory.value / "node_modules" / rf.getPath) }
+  def setupTsCompilationTask(): Def.Initialize[Task[Unit]] =
+    Def.task {
+      def copyPairs(baseDir: File, modules: Seq[File]): Seq[(File, File)] = {
+        modules
+          .flatMap(f => IO.relativizeFile(baseDir, f).map(rf => Seq((f, rf))).getOrElse(Seq.empty))
+          .map { case (f, rf) => (f, baseDirectory.value / "node_modules" / rf.getPath) }
+      }
+
+      val assetCopyPairs = copyPairs(
+        (webJarsNodeModulesDirectory in Assets).value,
+        (webJarsNodeModules in Assets).value
+      )
+
+      val testAssetCopyPairs = copyPairs(
+        (webJarsNodeModulesDirectory in TestAssets).value,
+        (webJarsNodeModules in TestAssets).value
+      )
+
+      IO.copy(assetCopyPairs ++ testAssetCopyPairs)
+      streams.value.log.info(s"Webjars copied to ./node_modules")
+      ()
     }
-
-    val assetCopyPairs = copyPairs(
-      (webJarsNodeModulesDirectory in Assets).value,
-      (webJarsNodeModules in Assets).value
-    )
-
-    val testAssetCopyPairs = copyPairs(
-      (webJarsNodeModulesDirectory in TestAssets).value,
-      (webJarsNodeModules in TestAssets).value
-    )
-
-    IO.copy(assetCopyPairs ++ testAssetCopyPairs)
-    streams.value.log.info(s"Webjars copied to ./node_modules")
-    ()
-  }
 
   /**
     * Parse tsconfig.json and replace the properties that we manage. Ie outDir viz outFile
     */
-  def parseTsConfig(): Def.Initialize[Task[JsObject]] = Def.task {
+  def parseTsConfig(): Def.Initialize[Task[JsObject]] =
+    Def.task {
 
-    /**
-      * Remove comments and then parse tsconfig.json
-      */
-    def parseJson(tsConfigFile: File): JsValue = {
-      val content = IO.read(tsConfigFile)
-      val noComment = JsonCleaner.minify(content)
-      JsonParser(noComment)
-    }
-
-    def fixJson(tsConfigFile: File): JsObject = {
-      val tsConfigObject = parseJson(tsConfigFile).asJsObject
-      val newTsConfigObject = for {
-        coJsValue <- tsConfigObject.fields.get("compilerOptions") if getCompileMode.value == CompileMode.Stage
-
-        co = coJsValue.asJsObject
-        newCo = JsObject(co.fields - "outDir" ++ Map("outFile" -> JsString(outFile.value)))
-      } yield JsObject(tsConfigObject.fields ++ Map("compilerOptions" -> newCo))
-      newTsConfigObject.getOrElse(tsConfigObject)
-    }
-
-    val defaultTsConfig = fixJson(projectFile.value)
-    val testTsConfigOverrides = projectTestFile.value
-      .map(fileName => baseDirectory.value / fileName)
-      .map(file => parseJson(file).asJsObject)
-    testTsConfigOverrides
-      .map(overrides => JsonUtil.merge(defaultTsConfig, overrides))
-      .getOrElse(defaultTsConfig)
-  }
-
-  def getCompileModeTask: Def.Initialize[Task[CompileMode]] = Def.task {
-    val modeOpt = for {
-      s <- sys.props.get("tsCompileMode")
-      cm <- CompileMode.parse.get(s)
-    } yield cm
-
-    modeOpt.getOrElse(compileMode.value)
-  }
-
-  def typescriptPipeTask: Def.Initialize[Task[Pipeline.Stage]] = Def.task {
-    val s = streams.value
-    val filter = (includeFilter in typescript in Assets).value
-    inputMappings =>
-      val isTypescript: PathMapping => Boolean = {
-        case (file, _) => filter.accept(file)
+      /**
+        * Remove comments and then parse tsconfig.json
+        */
+      def parseJson(tsConfigFile: File): JsValue = {
+        val content = IO.read(tsConfigFile)
+        val noComment = JsonCleaner.minify(content)
+        JsonParser(noComment)
       }
-      val minustypescriptMappings = inputMappings.filterNot(isTypescript)
-      s.log.debug(s"running typescript pipe")
 
-      minustypescriptMappings
-  }
+      def fixJson(tsConfigFile: File): JsObject = {
+        val tsConfigObject = parseJson(tsConfigFile).asJsObject
+        val newTsConfigObject = for {
+          coJsValue <- tsConfigObject.fields.get("compilerOptions") if getCompileMode.value == CompileMode.Stage
+
+          co = coJsValue.asJsObject
+          newCo = JsObject(co.fields - "outDir" ++ Map("outFile" -> JsString(outFile.value)))
+        } yield JsObject(tsConfigObject.fields ++ Map("compilerOptions" -> newCo))
+        newTsConfigObject.getOrElse(tsConfigObject)
+      }
+
+      val defaultTsConfig = fixJson(projectFile.value)
+      val testTsConfigOverrides = projectTestFile.value
+        .map(fileName => baseDirectory.value / fileName)
+        .map(file => parseJson(file).asJsObject)
+      testTsConfigOverrides
+        .map(overrides => JsonUtil.merge(defaultTsConfig, overrides))
+        .getOrElse(defaultTsConfig)
+    }
+
+  def getCompileModeTask: Def.Initialize[Task[CompileMode]] =
+    Def.task {
+      val modeOpt = for {
+        s <- sys.props.get("tsCompileMode")
+        cm <- CompileMode.parse.get(s)
+      } yield cm
+
+      modeOpt.getOrElse(compileMode.value)
+    }
+
+  def typescriptPipeTask: Def.Initialize[Task[Pipeline.Stage]] =
+    Def.task {
+      val s = streams.value
+      val filter = (includeFilter in typescript in Assets).value
+      inputMappings =>
+        val isTypescript: PathMapping => Boolean = {
+          case (file, _) => filter.accept(file)
+        }
+        val minustypescriptMappings = inputMappings.filterNot(isTypescript)
+        s.log.debug(s"running typescript pipe")
+
+        minustypescriptMappings
+    }
 
 }

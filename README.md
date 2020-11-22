@@ -5,7 +5,6 @@
 [![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
 
 This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
-Leverages the functionality of com.typesafe.sbt:js-engine to run the typescript compiler.
 
 ## Setup
 
@@ -19,9 +18,7 @@ If your project is not a Play application you will have to enable `sbt-web` in `
 
     lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
-There are several Javascript engines you can use for the build. The fastest is NodeJs. So make sure you have a recent NodeJs installed and add to `build.sbt`
-
-    JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
+It is REQUIRED that you have node js installed. It used to be possible to fallback to JVM-based trireme, but it no longer works with the latest javascript. Also sbt-js-engine broke with newer versions of npm. So now sbt-typescript just requires node. It's faster anyway.
 
 ### Dependencies
 
