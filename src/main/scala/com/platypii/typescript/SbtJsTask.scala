@@ -1,6 +1,6 @@
 package com.platypii.typescript
 
-import sbt.{Configuration, Def, _}
+import sbt.{Configuration, Def, File, _}
 import sbt.Keys._
 import com.typesafe.sbt.web.incremental.OpInputHasher
 import spray.json._
@@ -24,9 +24,7 @@ import sbinary.{Format, Input, Output}
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object JsTaskImport {
-
   object JsTaskKeys {
-
     val fileInputHasher = TaskKey[OpInputHasher[File]]("jstask-file-input-hasher", "A function that hashes a given file.")
     val jsOptions = TaskKey[String]("jstask-js-options", "The JSON options to be passed to the task.")
     val taskMessage = SettingKey[String]("jstask-message", "The message to output for a task")
@@ -35,8 +33,12 @@ object JsTaskImport {
     val timeoutPerSource =
       SettingKey[FiniteDuration]("jstask-timeout-per-source", "The maximum amount of time to wait per source file processed by the JS task.")
     val sourceDependencies = SettingKey[Seq[TaskKey[Seq[File]]]]("jstask-source-dependencies", "Source dependencies between source file tasks.")
+    val command = SettingKey[Option[File]]("jse-command", "An optional path to the command used to invoke the engine.")
+    val parallelism = SettingKey[Int](
+      "jse-parallelism",
+      "The number of parallel tasks for the JavaScript engine. Defaults to the # of available processors + 1 to keep things busy."
+    )
   }
-
 }
 
 /**
@@ -44,7 +46,7 @@ object JsTaskImport {
   */
 object SbtJsTask extends AutoPlugin {
 
-  override def requires: SbtJsEngine.type = SbtJsEngine
+  override def requires: SbtWeb.type = SbtWeb
 
   override def trigger: PluginTrigger = AllRequirements
 
@@ -52,8 +54,6 @@ object SbtJsTask extends AutoPlugin {
 
   import SbtWeb.autoImport._
   import WebKeys._
-  import SbtJsEngine.autoImport._
-  import JsEngineKeys._
   import autoImport._
   import JsTaskKeys._
 
@@ -89,7 +89,9 @@ object SbtJsTask extends AutoPlugin {
   override def projectSettings =
     Seq(
       jsOptions := "{}",
-      timeoutPerSource := 2.hours
+      timeoutPerSource := 2.hours,
+      command := sys.props.get("sbt.jse.command").map(file),
+      parallelism := java.lang.Runtime.getRuntime.availableProcessors() + 1
     )
 
   /**

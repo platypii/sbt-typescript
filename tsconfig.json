@@ -7,6 +7,7 @@
     "sourceMap": false,
     "rootDir": "src/main/typescript",
     "outDir": "./src/main/resources",
+    // "outFile": "src/main/resources/typescript.js",
     "baseUrl": ".",
     "paths": {
       "*": [
@@ -18,11 +19,10 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noEmitOnError": true,
-    "noFallthroughCasesInSwitch":true,
+    "noFallthroughCasesInSwitch": true,
     "preserveConstEnums": true,
     "noImplicitThis": true,
-    "strictNullChecks": true,
-    // "outFile": "src/main/resources/typescript.js"
+    "strictNullChecks": true
   },
   "exclude": [
     "example",
