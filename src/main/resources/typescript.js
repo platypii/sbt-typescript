@@ -45,29 +45,6 @@ var Logger = (function () {
     };
     return Logger;
 }());
-var Some = (function () {
-    function Some(value) {
-        this.value = value;
-    }
-    Some.prototype.foreach = function (f) {
-        return f(this.value);
-    };
-    Some.prototype.map = function (f) {
-        return new Some(f(this.value));
-    };
-    return Some;
-}());
-var None = (function () {
-    function None() {
-    }
-    None.prototype.foreach = function (f) {
-        return;
-    };
-    None.prototype.map = function (f) {
-        return new None();
-    };
-    return None;
-}());
 var SourceMapping = (function () {
     function SourceMapping(a) {
         this.absolutePath = a[0];
@@ -101,17 +78,14 @@ var SourceMappings = (function () {
         var absPath = path.normalize(sourceFileName);
         var index = this.asAbsolutePaths().indexOf(absPath);
         if (index !== -1) {
-            return new Some(this.mappings[index]);
+            return this.mappings[index];
         }
         else {
-            return new None();
+            return undefined;
         }
     };
     return SourceMappings;
 }());
-function compileDone(compileResult) {
-    console.log("\u0010" + JSON.stringify(compileResult));
-}
 function parseArgs(args) {
     var SOURCE_FILE_MAPPINGS_ARG = 2;
     var TARGET_ARG = 3;
@@ -159,6 +133,9 @@ logger.debug("to ", args.target);
 logger.debug("args " + JSON.stringify(args, null, 2));
 var compileResult = compile(sourceMappings, sbtTypescriptOpts, args.target);
 compileDone(compileResult);
+function compileDone(compileResult) {
+    console.log("\u0010" + JSON.stringify(compileResult));
+}
 function compile(sourceMaps, sbtOptions, target) {
     var problems = [];
     var results = [];
@@ -234,7 +211,6 @@ function compile(sourceMaps, sbtOptions, target) {
             if (!emitOutput.emitSkipped)
                 logger.error(errorMessage);
         }
-        return;
         function minus(arr1, arr2) {
             var r = [];
             for (var _i = 0, arr1_1 = arr1; _i < arr1_1.length; _i++) {
@@ -364,15 +340,17 @@ function compile(sourceMaps, sbtOptions, target) {
     function flatten(xs) {
         var result = [];
         xs.forEach(function (x) {
-            if (x.value)
-                result.push(x.value);
+            if (x !== undefined) {
+                result.push(x);
+            }
         });
         return result;
     }
 }
 function toCompilationResult(sourceMappings, compilerOptions) {
     return function (sourceFile) {
-        return sourceMappings.find(sourceFile.fileName).map(function (sm) {
+        var sm = sourceMappings.find(sourceFile.fileName);
+        if (sm !== undefined) {
             var deps = [sourceFile.fileName].concat(sourceFile.referencedFiles.map(function (f) { return f.fileName; }));
             var outputFile = determineOutFile(sm.toOutputPath(compilerOptions.outDir, ".js"), compilerOptions);
             var filesWritten = [outputFile];
@@ -391,17 +369,20 @@ function toCompilationResult(sourceMappings, compilerOptions) {
                     filesWritten: filesWritten
                 }
             };
-            function determineOutFile(outFile, options) {
-                if (options.outFile) {
-                    logger.debug("single outFile ", options.outFile);
-                    return options.outFile;
-                }
-                else {
-                    return outFile;
-                }
-            }
-        });
+        }
+        else {
+            return undefined;
+        }
     };
+}
+function determineOutFile(outFile, options) {
+    if (options.outFile) {
+        logger.debug("single outFile ", options.outFile);
+        return options.outFile;
+    }
+    else {
+        return outFile;
+    }
 }
 function findPreemitProblems(program, tsIgnoreList) {
     var diagnostics = typescript_1.getPreEmitDiagnostics(program);

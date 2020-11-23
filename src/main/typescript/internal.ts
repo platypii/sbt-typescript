@@ -4,34 +4,6 @@
 const path = require("path")
 require("es6-shim")
 
-interface Option<T> {
-  value?: T
-  foreach(f: (t: T) => any): any
-  map<B>(f: (t: T) => B): Option<B>
-}
-
-class Some<T> {
-  constructor(public value: T) {
-  }
-
-  foreach(f: (t: T) => any) {
-    return f(this.value)
-  }
-
-  map<B>(f: (t: T) => B): Option<B> {
-    return new Some(f(this.value))
-  }
-}
-class None<T> implements Option<T> {
-  foreach(f: (t: T) => any) {
-    return
-  }
-
-  map<B>(f: (t: T) => B): Option<B> {
-    return new None<B>()
-  }
-}
-
 class SourceMapping {
   public absolutePath: string
   public relativePath: string
@@ -74,15 +46,14 @@ class SourceMappings {
     }
     return this.relativePaths
   }
-  find(sourceFileName: string): Option<SourceMapping> {
+  find(sourceFileName: string): SourceMapping | undefined {
     const absPath = path.normalize(sourceFileName)
     const index = this.asAbsolutePaths().indexOf(absPath)
     if (index !== -1) {
-      return new Some(this.mappings[index])
-
+      return this.mappings[index]
     } else {
-//            logger.error("did not find '" + absPath + "'")
-      return new None()
+      // logger.error("did not find '" + absPath + "'")
+      return undefined
     }
   }
 }

@@ -107,7 +107,7 @@ function compile(sourceMaps: SourceMappings, sbtOptions: SbtTypescriptOptions, t
     problems
   }
 
-  function logAndAssertEmitted(declaredResults: CompilationFileResult[], emitOutput: EmitResult) {
+  function logAndAssertEmitted(declaredResults: CompilationFileResult[], emitOutput: EmitResult): void {
     const ffw = flatFilesWritten(declaredResults)
     const emitted = emitOutput.emitSkipped ? [] : emitOutput.emittedFiles || []
     logger.debug("files written", ffw)
@@ -136,7 +136,6 @@ declared but not emitted ${declaredButNotEmitted}
       if (!emitOutput.emitSkipped) logger.error(errorMessage) // throw new Error(errorMessage)
     }
 
-    return
     function minus(arr1: string[], arr2: string[]): string[] {
       const r: string[] = []
       for (const s of arr1) {
@@ -284,18 +283,21 @@ declared but not emitted ${declaredButNotEmitted}
     return ".d.ts" === fileName.substring(fileName.length - 5)
   }
 
-  function flatten<T>(xs: Option<T>[]): T[] {
+  function flatten<T>(xs: Array<T | undefined>): T[] {
     const result: T[] = []
     xs.forEach(x => {
-      if (x.value) result.push(x.value)
+      if (x !== undefined) {
+        result.push(x)
+      }
     })
     return result
   }
 }
 
-function toCompilationResult(sourceMappings: SourceMappings, compilerOptions: CompilerOptions): (sf: SourceFile) => Option<CompilationFileResult> {
+function toCompilationResult(sourceMappings: SourceMappings, compilerOptions: CompilerOptions): (sf: SourceFile) => CompilationFileResult | undefined {
   return sourceFile => {
-    return sourceMappings.find(sourceFile.fileName).map((sm) => {
+    const sm = sourceMappings.find(sourceFile.fileName)
+    if (sm !== undefined) {
       // logger.debug("source file is ", sourceFile.fileName)
       const deps = [sourceFile.fileName].concat(sourceFile.referencedFiles.map(f => f.fileName))
       const outputFile = determineOutFile(sm.toOutputPath(compilerOptions.outDir!, ".js"), compilerOptions)
@@ -318,16 +320,18 @@ function toCompilationResult(sourceMappings: SourceMappings, compilerOptions: Co
           filesWritten
         }
       }
+    } else {
+      return undefined
+    }
+  }
+}
 
-      function determineOutFile(outFile: string, options: CompilerOptions): string {
-        if (options.outFile) {
-          logger.debug("single outFile ", options.outFile)
-          return options.outFile
-        } else {
-          return outFile
-        }
-      }
-    })
+function determineOutFile(outFile: string, options: CompilerOptions): string {
+  if (options.outFile) {
+    logger.debug("single outFile ", options.outFile)
+    return options.outFile
+  } else {
+    return outFile
   }
 }
 
