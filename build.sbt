@@ -1,7 +1,7 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "4.0.5.3"
+version := "4.1.2"
 
 // Scala needs to match sbt
 scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" %% "jse" % "1.2.4", // TODO: Remove me
 
   // js dependencies
-  "org.webjars.npm" % "typescript" % "4.0.5",
+  "org.webjars.npm" % "typescript" % "4.1.2",
   // Used by ...?
   "org.webjars.npm" % "fs-extra" % "9.0.1",
   "org.webjars.npm" % "es6-shim" % "0.35.6",
