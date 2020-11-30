@@ -4,7 +4,7 @@ default:
 test:
   stage: test
   script:
-    # - sbt "scripted sbt-typescript/angular2"
+    - sbt "scripted sbt-typescript/angular2"
     - sbt "scripted sbt-typescript/atTypes"
     - sbt "scripted sbt-typescript/es6-es5"
     - sbt "scripted sbt-typescript/ignoreCanNotFindModule"

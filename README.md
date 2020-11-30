@@ -11,7 +11,7 @@ This sbt plugin compiles the TypeScript code in your Play application to javascr
 Add the following line to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.0.5")
+addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.1.2")
 ```
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:

@@ -1,7 +1,7 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "4.1.2"
+version := "4.1.3-SNAPSHOT"
 
 // Scala needs to match sbt
 scalaVersion := (CrossVersion partialVersion sbtCrossVersion.value match {
