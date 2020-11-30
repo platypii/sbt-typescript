@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
 require("es6-shim");
 var Logger = (function () {
@@ -97,9 +98,9 @@ function parseArgs(args) {
     }
     catch (e) {
         sourceFileMappings = [[
-                path.join(cwd, args[SOURCE_FILE_MAPPINGS_ARG]),
-                args[SOURCE_FILE_MAPPINGS_ARG]
-            ]];
+            path.join(cwd, args[SOURCE_FILE_MAPPINGS_ARG]),
+            args[SOURCE_FILE_MAPPINGS_ARG]
+        ]];
     }
     var target = (args.length > TARGET_ARG ? args[TARGET_ARG] : path.join(cwd, "lib"));
     var options;
@@ -120,9 +121,7 @@ function replaceFileExtension(file, ext) {
     var oldExt = path.extname(file);
     return file.substring(0, file.length - oldExt.length) + ext;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 var typescript_1 = require("typescript");
-var fs = require("fs-extra");
 var args = parseArgs(process.argv);
 var sbtTypescriptOpts = args.options;
 var logger = new Logger(sbtTypescriptOpts.logLevel);
@@ -169,10 +168,10 @@ function compile(sourceMaps, sbtOptions, target) {
         var moveTestPromise = sbtOptions.assetsDirs.length === 2 ? moveEmittedTestAssets(sbtOptions) : Promise.resolve({});
         moveTestPromise
             .then(function () {
-            if (sbtOptions.assertCompilation) {
-                logAndAssertEmitted(results, emitOutput_1);
-            }
-        }, function () { });
+                if (sbtOptions.assertCompilation) {
+                    logAndAssertEmitted(results, emitOutput_1);
+                }
+            }, function () { });
         problems.push.apply(problems, toProblems(emitOutput_1.diagnostics, sbtOptions.tsCodesToIgnore));
         if (logger.isDebug) {
             var declarationFiles = program.getSourceFiles().filter(isDeclarationFile);
@@ -198,13 +197,13 @@ function compile(sourceMaps, sbtOptions, target) {
         var declaredButNotEmitted = minus(ffw, emitted);
         notExistingFiles(ffw)
             .then(function (nef) {
-            if (nef.length > 0) {
-                logger.error("files declared that have not been generated " + nef);
-            }
-            else {
-                logger.debug("all declared files exist");
-            }
-        })
+                if (nef.length > 0) {
+                    logger.error("files declared that have not been generated " + nef);
+                }
+                else {
+                    logger.debug("all declared files exist");
+                }
+            })
             .catch(function (err) { return logger.error("unexpected error", err); });
         if (emittedButNotDeclared.length > 0 || declaredButNotEmitted.length > 0) {
             var errorMessage = "\nemitted and declared files are not equal\nemitted but not declared " + emittedButNotDeclared + "\ndeclared but not emitted " + declaredButNotEmitted + "\n";
@@ -227,72 +226,11 @@ function compile(sourceMaps, sbtOptions, target) {
         var relPathAssets = sbtOpts.assetsDirs[0].substring(common.length);
         var relPathTestAssets = sbtOpts.assetsDirs[1].substring(common.length);
         var sourcePath = path.join(target, relPathTestAssets);
-        return Promise.all([remove(path.join(target, relPathAssets)), move(sourcePath, target)]);
-    }
-    function remove(dir) {
-        return new Promise(function (resolve, reject) {
-            fs.remove(dir, function (e) {
-                if (e) {
-                    reject(e);
-                }
-                else {
-                    logger.debug("removed", dir);
-                    resolve({});
-                }
-            });
-        });
-    }
-    function move(sourcePath, target) {
-        return new Promise(function (resolve, reject) {
-            fs.copy(sourcePath, target, function (e) {
-                if (e) {
-                    reject(e);
-                }
-                else {
-                    fs.remove(sourcePath, function (e) {
-                        if (e) {
-                            reject(e);
-                        }
-                        else {
-                            logger.debug("moved contents of " + sourcePath + " to " + target);
-                            resolve({});
-                        }
-                    });
-                }
-            });
-        });
-    }
-    function notExistingFiles(filesDeclared) {
-        return Promise.all(filesDeclared.map(exists))
-            .then(function (e) {
-            return e.filter(function (a) {
-                var s = a[0], exist = a[1];
-                return !exist;
-            })
-                .map(function (a) {
-                var s = a[0], b = a[1];
-                return s;
-            });
-        });
-        function exists(file) {
-            return new Promise(function (resolve, reject) {
-                fs.access(file, function (errAccess) {
-                    if (errAccess) {
-                        resolve([file, false]);
-                    }
-                    else {
-                        fs.stat(file, function (err, stats) {
-                            if (err) {
-                                reject(err);
-                            }
-                            else {
-                                resolve([file, stats.isFile()]);
-                            }
-                        });
-                    }
-                });
-            });
-        }
+        var futureRemove = remove(path.join(target, relPathAssets));
+        futureRemove.then(function () { return logger.debug("removed " + target + "/" + relPathAssets); });
+        var futureMove = move(sourcePath, target);
+        futureMove.then(function () { return logger.debug("moved " + sourcePath + " to " + target); });
+        return Promise.all([futureRemove, futureMove]);
     }
     function commonPath(path1, path2) {
         var commonPath = "";
@@ -433,4 +371,66 @@ function parseDiagnostic(d) {
             return "error";
         }
     }
+}
+var fs = require("fs-extra");
+function remove(dir) {
+    return new Promise(function (resolve, reject) {
+        fs.remove(dir, function (e) {
+            if (e) {
+                reject(e);
+            }
+            else {
+                resolve();
+            }
+        });
+    });
+}
+function move(sourcePath, target) {
+    return new Promise(function (resolve, reject) {
+        fs.copy(sourcePath, target, function (e) {
+            if (e) {
+                reject(e);
+            }
+            else {
+                fs.remove(sourcePath, function (e) {
+                    if (e) {
+                        reject(e);
+                    }
+                    else {
+                        resolve();
+                    }
+                });
+            }
+        });
+    });
+}
+function notExistingFiles(filesDeclared) {
+    return Promise.all(filesDeclared.map(exists))
+        .then(function (e) {
+            return e.filter(function (a) {
+                var s = a[0], exist = a[1];
+                return !exist;
+            })
+                .map(function (a) {
+                    var s = a[0], b = a[1];
+                    return s;
+                });
+        });
+}
+function exists(file) {
+    return new Promise(function (resolve, reject) {
+        fs.access(file, function (errAccess) {
+            if (errAccess) {
+                resolve([file, false]);
+            } else {
+                fs.stat(file, function (err, stats) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve([file, stats.isFile()]);
+                    }
+                });
+            }
+        });
+    });
 }

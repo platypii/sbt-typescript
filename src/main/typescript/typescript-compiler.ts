@@ -2,6 +2,7 @@
 /// <reference path="logger.ts" />
 /// <reference path="internal.ts" />
 /// <reference path="sbt-web.d.ts" />
+/// <reference path="files.ts" />
 
 import {
   CompilerOptions,
@@ -18,7 +19,7 @@ import {
   sys
 } from "typescript"
 import { Logger } from "./logger"
-import * as fs from "fs-extra"
+import * as fs from "./files"
 
 const args: Args = parseArgs(process.argv)
 const sbtTypescriptOpts: SbtTypescriptOptions = args.options
@@ -116,7 +117,7 @@ function compile(sourceMaps: SourceMappings, sbtOptions: SbtTypescriptOptions, t
     const emittedButNotDeclared = minus(emitted, ffw)
     const declaredButNotEmitted = minus(ffw, emitted)
 
-    notExistingFiles(ffw)
+    fs.notExistingFiles(ffw)
       .then(nef => {
         if (nef.length > 0) {
           logger.error(`files declared that have not been generated ${nef}`)
@@ -147,93 +148,29 @@ declared but not emitted ${declaredButNotEmitted}
     }
   }
 
+  /**
+   * When compiling test assets, unfortunately because we have two rootdirs the paths are not being relativized to outDir
+   * see https://github.com/Microsoft/TypeScript/issues/7837
+   * so we get
+   * ...<outdir>/main/assets/<code> and
+   * ...<outdir>/test/assets/<code> because they have ./src in common
+   * we need to find out what their relative paths are wrt the path they have in common
+   * and move the desired emitted test files up to the target path
+   */
   function moveEmittedTestAssets(sbtOpts: SbtTypescriptOptions): Promise<any> {
-    // we're compiling testassets
-    // unfortunately because we have two rootdirs the paths are not being relativized to outDir
-    // see https://github.com/Microsoft/TypeScript/issues/7837
-    // so we get
-    // ...<outdir>/main/assets/<code> and
-    // ...<outdir>/test/assets/<code> because they have ./src in common
-    // we need to find out what their relative paths are wrt the path they have in common
     const common = commonPath(sbtOpts.assetsDirs[0], sbtOpts.assetsDirs[1])
     const relPathAssets = sbtOpts.assetsDirs[0].substring(common.length)
     const relPathTestAssets = sbtOpts.assetsDirs[1].substring(common.length)
 
     const sourcePath = path.join(target, relPathTestAssets)
-    // and move the desired emitted test files up to the target path
-    // const moveMsg = `${sourcePath} to ${target}`
-    // logger.debug("will remove", target + "/" + relPathAssets)
-    // logger.debug(`will move contents of ${moveMsg}`)
-    // fs.remove(target + "/" + relPathAssets, (e: any) => logger.debug("removed", target + "/" + relPathAssets))
-    // fs.copy(sourcePath, target, (e: any) => {
-    //     logger.debug(`moved contents of ${moveMsg} ${e}`)
-    //     fs.remove(target + "/" + relPathTestAssets, (e: any) => true)
-    // })
-    return Promise.all([remove(path.join(target, relPathAssets)), move(sourcePath, target)])
+    // logger.debug(`removing ${target}/${relPathAssets}`)
+    const futureRemove = fs.remove(path.join(target, relPathAssets))
+    futureRemove.then(() => logger.debug(`removed ${target}/${relPathAssets}`))
+    // logger.debug(`moving ${sourcePath} to ${target}`)
+    const futureMove = fs.move(sourcePath, target)
+    futureMove.then(() => logger.debug(`moved ${sourcePath} to ${target}`))
+    return Promise.all([futureRemove, futureMove])
   }
-
-  function remove(dir: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      fs.remove(dir, (e: any) => {
-        if (e) {
-          reject(e)
-        } else {
-          logger.debug("removed", dir)
-          resolve({})
-        }
-      })
-    })
-  }
-
-  function move(sourcePath: string, target: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      fs.copy(sourcePath, target, (e: any) => {
-        if (e) {
-          reject(e)
-        } else {
-          fs.remove(sourcePath, (e: any) => {
-            if (e) {
-              reject(e)
-            } else {
-              logger.debug(`moved contents of ${sourcePath} to ${target}`)
-              resolve({})
-            }
-          })
-        }
-      })
-    })
-  }
-  function notExistingFiles(filesDeclared: string[]): Promise<string[]> {
-    return Promise.all(filesDeclared.map(exists))
-      .then((e: [string, boolean][]) => {
-        return e.filter(a => {
-          const [s, exist] = a
-          return !exist
-        })
-        .map(a => {
-          const [s, b] = a
-          return s
-        })
-      })
-    function exists(file: string): Promise<[string, boolean]> {
-      return new Promise<[string, boolean]>((resolve, reject) => {
-        fs.access(file, (errAccess: any) => {
-          if (errAccess) {
-            resolve([file, false])
-          } else {
-            fs.stat(file, (err: any, stats: any) => {
-              if (err) {
-                reject(err)
-              } else {
-                resolve([file, stats.isFile()])
-              }
-            })
-          }
-        })
-      })
-    }
-  }
-
 
   function commonPath(path1: string, path2: string) {
     let commonPath = ""
