@@ -80,12 +80,6 @@ object SbtJsTask extends AutoPlugin {
       }
     )
 
-  @deprecated(
-    "Add jsTaskSpecificUnscopedProjectSettings to AutoPlugin.projectSettings and jsTaskSpecificUnscopedBuildSettings to AutoPlugin.buildSettings",
-    "1.2.0"
-  )
-  val jsTaskSpecificUnscopedSettings: Seq[Def.Setting[_]] = jsTaskSpecificUnscopedProjectSettings ++ jsTaskSpecificUnscopedBuildSettings
-
   override def projectSettings =
     Seq(
       jsOptions := "{}",
@@ -261,9 +255,9 @@ object SbtJsTask extends AutoPlugin {
     }
   }
 
-  /*
-   * For reading/writing binary representations of files.
-   */
+  /**
+    * For reading/writing binary representations of files.
+    */
   private implicit object FileFormat extends Format[File] {
 
     import sbinary.DefaultProtocol._
