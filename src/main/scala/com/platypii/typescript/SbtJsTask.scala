@@ -1,27 +1,20 @@
 package com.platypii.typescript
 
-import sbt.{Configuration, Def, File, _}
-import sbt.Keys._
-import com.typesafe.sbt.web.incremental.OpInputHasher
-import spray.json._
-import com.typesafe.sbt.web._
-import xsbti.{Problem, Severity}
-import com.typesafe.sbt.web.incremental.OpResult
-import com.typesafe.sbt.web.incremental.OpFailure
-import com.typesafe.sbt.web.incremental.OpInputHash
 import akka.actor.ActorRef
-import akka.util.Timeout
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.collection.immutable
-import com.typesafe.sbt.web.SbtWeb._
 import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.jse.Engine.JsExecutionResult
 import com.typesafe.jse.{Engine, LocalEngine, Node}
-import com.typesafe.sbt.web.incremental
-import com.typesafe.sbt.web.CompileProblems
-import com.typesafe.sbt.web.incremental.OpSuccess
-import sbinary.{Format, Input, Output}
+import com.typesafe.sbt.web.SbtWeb.withActorRefFactory
+import com.typesafe.sbt.web.{CompileProblems, incremental, _}
+import com.typesafe.sbt.web.incremental.{OpInputHash, OpInputHasher, OpResult}
+import sbt.Keys._
+import sbt.{Configuration, Def, File, _}
+import scala.collection.immutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import spray.json.{JsArray, JsString, JsValue, JsonParser}
+import xsbti.Problem
 
 object JsTaskImport {
   object JsTaskKeys {
@@ -92,84 +85,6 @@ object SbtJsTask extends AutoPlugin {
     * Thrown when there is an unexpected problem to do with the task's execution.
     */
   class JsTaskFailure(m: String) extends RuntimeException(m)
-
-  /**
-    * For automatic transformation of Json structures.
-    */
-  object JsTaskProtocol extends DefaultJsonProtocol {
-
-    implicit object FileFormat extends JsonFormat[File] {
-      override def write(f: File): JsString = JsString(f.getCanonicalPath)
-
-      override def read(value: JsValue): sbt.File =
-        value match {
-          case s: JsString => new File(s.convertTo[String])
-          case x => deserializationError(s"String expected for a file, instead got $x")
-        }
-    }
-
-    implicit val opSuccessFormat: RootJsonFormat[OpSuccess] = jsonFormat2(OpSuccess)
-
-    implicit object LineBasedProblemFormat extends JsonFormat[LineBasedProblem] {
-      override def write(p: LineBasedProblem): JsObject =
-        JsObject(
-          "message" -> JsString(p.message),
-          "severity" -> {
-            p.severity match {
-              case Severity.Info => JsString("info")
-              case Severity.Warn => JsString("warn")
-              case Severity.Error => JsString("error")
-            }
-          },
-          "lineNumber" -> JsNumber(p.position.line.get),
-          "characterOffset" -> JsNumber(p.position.offset.get),
-          "lineContent" -> JsString(p.position.lineContent),
-          "source" -> FileFormat.write(p.position.sourceFile.get)
-        )
-
-      override def read(value: JsValue): LineBasedProblem =
-        value match {
-          case o: JsObject =>
-            new LineBasedProblem(
-              o.fields.get("message").fold("unknown message")(_.convertTo[String]),
-              o.fields.get("severity").fold(Severity.Error) {
-                case JsString("info") => Severity.Info
-                case JsString("warn") => Severity.Warn
-                case _ => Severity.Error
-              },
-              o.fields.get("lineNumber").fold(0)(_.convertTo[Int]),
-              o.fields.get("characterOffset").fold(0)(_.convertTo[Int]),
-              o.fields.get("lineContent").fold("unknown line content")(_.convertTo[String]),
-              o.fields.get("source").fold(file(""))(_.convertTo[File])
-            )
-          case x => deserializationError(s"Object expected for the problem, instead got $x")
-        }
-
-    }
-
-    implicit object OpResultFormat extends JsonFormat[OpResult] {
-
-      override def write(r: OpResult): JsValue =
-        r match {
-          case OpFailure => JsNull
-          case s: OpSuccess => opSuccessFormat.write(s)
-        }
-
-      override def read(value: JsValue): OpResult =
-        value match {
-          case o: JsObject => opSuccessFormat.read(o)
-          case JsNull => OpFailure
-          case x => deserializationError(s"Object expected for the op result, instead got $x")
-        }
-    }
-
-    case class ProblemResultsPair(results: Seq[SourceResultPair], problems: Seq[LineBasedProblem])
-
-    case class SourceResultPair(result: OpResult, source: File)
-
-    implicit val sourceResultPairFormat: RootJsonFormat[SourceResultPair] = jsonFormat2(SourceResultPair)
-    implicit val problemResultPairFormat: RootJsonFormat[ProblemResultsPair] = jsonFormat2(ProblemResultsPair)
-  }
 
   // node.js docs say *NOTHING* about what encoding is used when you write a string to stdout.
   // It seems that they have it hard coded to use UTF-8, some small tests I did indicate that changing the platform
@@ -253,18 +168,6 @@ object SbtJsTask extends AutoPlugin {
       }
       (prp.results.map(sr => sr.source -> sr.result).toMap, prp.problems)
     }
-  }
-
-  /**
-    * For reading/writing binary representations of files.
-    */
-  private implicit object FileFormat extends Format[File] {
-
-    import sbinary.DefaultProtocol._
-
-    override def reads(in: Input): File = file(StringFormat.reads(in))
-
-    override def writes(out: Output, fh: File): Unit = StringFormat.writes(out, fh.getAbsolutePath)
   }
 
   /**

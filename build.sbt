@@ -1,10 +1,10 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "4.1.3"
+version := "4.1.4-SNAPSHOT"
 
 // Scala needs to match sbt
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.12"
 
 updateOptions := updateOptions.value.withCachedResolution(true)
 
