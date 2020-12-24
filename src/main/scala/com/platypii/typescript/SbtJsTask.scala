@@ -124,7 +124,7 @@ object SbtJsTask extends AutoPlugin {
           results
         } else {
           val (out, json) = line.span(_ != JsonEscapeChar)
-          if (!out.isEmpty) {
+          if (out.nonEmpty) {
             stdoutSink(out)
           }
           results :+ JsonParser(json.drop(1))
@@ -151,8 +151,11 @@ object SbtJsTask extends AutoPlugin {
 
     import ExecutionContext.Implicits.global
 
+    val canonicalSourceFileMappings = sourceFileMappings.map {
+      case (file, str) => JsArray(JsString(file.getCanonicalPath), JsString(str))
+    }.toVector
     val args = immutable.Seq(
-      JsArray(sourceFileMappings.map(x => JsArray(JsString(x._1.getCanonicalPath), JsString(x._2))).toVector).toString(),
+      JsArray(canonicalSourceFileMappings).toString,
       target.getAbsolutePath,
       options
     )
@@ -283,48 +286,6 @@ object SbtJsTask extends AutoPlugin {
     ) ++
       inConfig(Assets)(addUnscopedJsSourceFileTasks(sourceFileTask)) ++
       inConfig(TestAssets)(addUnscopedJsSourceFileTasks(sourceFileTask))
-  }
-
-  /**
-    * Execute some arbitrary JavaScript.
-    *
-    * This method is intended to assist in building SBT tasks that execute generic JavaScript.  For example:
-    *
-    * {{{
-    * myTask := {
-    *   executeJs(state.value, Seq((nodeModules in Plugin).value.getCanonicalPath,
-    *     baseDirectory.value / "path" / "to" / "myscript.js", Seq("arg1", "arg2"), 30.seconds)
-    * }
-    * }}}
-    *
-    * @param state The SBT state.
-    * @param command An optional path to the engine.
-    * @param nodeModules The node modules to provide (if the JavaScript engine in use supports this).
-    * @param shellSource The script to execute.
-    * @param args The arguments to pass to the script.
-    * @param timeout The maximum amount of time to wait for the script to finish.
-    * @return A JSON status object if one was sent by the script.  A script can send a JSON status object by, as the
-    *         last thing it does, sending a DLE character (0x10) followed by some JSON to std out.
-    */
-  def executeJs(
-    state: State,
-    command: Option[File],
-    nodeModules: Seq[String],
-    shellSource: File,
-    args: Seq[String],
-    timeout: FiniteDuration
-  ): Seq[JsValue] = {
-    val engineProps = Node.props(command, stdEnvironment = LocalEngine.nodePathEnv(nodeModules.to[immutable.Seq]))
-
-    withActorRefFactory(state, this.getClass.getName) { arf =>
-      val engine = arf.actorOf(engineProps)
-      implicit val t: Timeout = Timeout(timeout)
-      import ExecutionContext.Implicits.global
-      Await.result(
-        executeJsOnEngine(engine, shellSource, args, m => state.log.error(m), m => state.log.info(m)),
-        timeout
-      )
-    }
   }
 
 }

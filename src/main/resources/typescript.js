@@ -150,7 +150,6 @@ function compile(sourceMaps, sbtOptions, target) {
             nodeModulesPaths = nodeModulesPaths.concat(sbtOptions.nodeModulesDirs.map(function (p) { return p + "/@types/*"; }));
             compilerOptions.typeRoots = sbtOptions.nodeModulesDirs.map(function (p) { return p + "/@types"; });
         }
-        var assetPaths = sbtOptions.assetsDirs.map(function (p) { return p + "/*"; });
         compilerOptions.baseUrl = ".";
         compilerOptions.paths = {
             "*": ["*"].concat(nodeModulesPaths)

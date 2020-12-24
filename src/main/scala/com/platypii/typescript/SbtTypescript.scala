@@ -173,7 +173,7 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
             "extraFiles" -> typingsFile.value.map(tf => JsArray(JsString(tf.getCanonicalPath)))
           )
         )
-      ).toString()
+      ).toString
     )
   }
 

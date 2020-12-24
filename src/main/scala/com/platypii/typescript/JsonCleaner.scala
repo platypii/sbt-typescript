@@ -81,7 +81,7 @@ object JsonCleaner {
         }
       }
       new_str.append(rc)
-      new_str.toString()
+      new_str.toString
     }
   }
 }

@@ -61,7 +61,6 @@ function compile(sourceMaps: SourceMappings, sbtOptions: SbtTypescriptOptions, t
       compilerOptions.typeRoots = sbtOptions.nodeModulesDirs.map(p => p + "/@types")
     }
 
-    const assetPaths = sbtOptions.assetsDirs.map(p => p + "/*")
     // see https://github.com/Microsoft/TypeScript-Handbook/blob/release-2.0/pages/Module%20Resolution.md#path-mapping
     compilerOptions.baseUrl = "."
     compilerOptions.paths = {

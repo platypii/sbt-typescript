@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+shopt -s globstar
+
+# TODO: Fetch latest version
+VERSION=1.4.6
+
+echo "Setting sbt.version=$VERSION"
+
+for f in **/build.properties; do
+  echo "sbt.version=$VERSION" > $f
+done
