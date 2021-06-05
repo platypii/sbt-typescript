@@ -1,8 +1,8 @@
 # sbt-typescript
 
-[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://gitlab.com/baselinews/sbt-typescript/badges/master/pipeline.svg)](https://gitlab.com/baselinews/sbt-typescript)
-[![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
+## Typescript :handshake: Scala
+
+[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://gitlab.com/baselinews/sbt-typescript/badges/master/pipeline.svg)](https://gitlab.com/baselinews/sbt-typescript) [![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
 
 This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
 
@@ -11,7 +11,7 @@ This sbt plugin compiles the TypeScript code in your Play application to javascr
 Add the following line to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.1.3")
+addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.3.2")
 ```
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
