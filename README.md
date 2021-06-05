@@ -80,7 +80,7 @@ For instance [sbt-jasmine](https://github.com/joost-de-vries/sbt-jasmine) or [sb
 You can override `tsc` configurations for your test code.
 To do that create a file `tsconfig.test.json` and add to `build.sbt`
 
-    (projectTestFile in typescript) := Some("tsconfig.test.json")
+    (typescript / projectTestFile) := Some("tsconfig.test.json")
 
 Any settings in that file will override those in `tsconfig.json` for the compilation of test code.
 

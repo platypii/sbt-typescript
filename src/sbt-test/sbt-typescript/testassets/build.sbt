@@ -1,6 +1,6 @@
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
-logLevel in typescript := Level.Debug
+typescript / logLevel := Level.Debug
 
-assertCompilation in typescript := true
+typescript / assertCompilation := true

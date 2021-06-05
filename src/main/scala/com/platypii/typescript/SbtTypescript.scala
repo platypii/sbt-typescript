@@ -104,7 +104,7 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
       projectTestFile := None, // baseDirectory.value / "tsconfig.test.json",
       typingsFile := None,
       resolveFromWebjarsNodeModulesDir := false,
-      logLevel in typescript := Level.Info,
+      typescript / logLevel := Level.Info,
       typescriptPipe := typescriptPipeTask.value,
       parallelism := 1,
       compileMode := CompileMode.Compile,
@@ -117,12 +117,12 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
         inConfig(Assets)(typescriptUnscopedSettings(Assets)) ++
         inConfig(TestAssets)(typescriptUnscopedSettings(TestAssets)) ++
         Seq(
-          taskMessage in Assets := "Typescript compiling",
-          taskMessage in TestAssets := "Typescript test compiling"
+          Assets / taskMessage := "Typescript compiling",
+          TestAssets / taskMessage := "Typescript test compiling"
         )
     ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
-      typescript in Assets := (typescript in Assets).dependsOn(webJarsNodeModules in Assets).value,
-      typescript in TestAssets := (typescript in TestAssets).dependsOn(webJarsNodeModules in TestAssets).value
+      Assets / typescript := (Assets / typescript).dependsOn(Assets / webJarsNodeModules).value,
+      TestAssets / typescript := (TestAssets / typescript).dependsOn(TestAssets / webJarsNodeModules).value
     )
 
   def typescriptUnscopedSettings(config: Configuration): Seq[Setting[_]] = {
@@ -157,13 +157,13 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
           "tsconfig" -> parseTsConfig().value,
           "tsconfigDir" -> JsString(projectFile.value.getParent),
           "assetsDirs" -> toJsArray(
-            mainDir = (sourceDirectory in Assets).value.getAbsolutePath,
-            testDir = (sourceDirectory in TestAssets).value.getAbsolutePath
+            mainDir = (Assets / sourceDirectory).value.getAbsolutePath,
+            testDir = (TestAssets / sourceDirectory).value.getAbsolutePath
           ),
           "tsCodesToIgnore" -> JsArray(tsCodesToIgnore.value.toVector.map(JsNumber(_))),
           "nodeModulesDirs" -> toJsArray(
-            mainDir = (webJarsNodeModulesDirectory in Assets).value.getAbsolutePath,
-            testDir = (webJarsNodeModulesDirectory in TestAssets).value.getAbsolutePath
+            mainDir = (Assets / webJarsNodeModulesDirectory).value.getAbsolutePath,
+            testDir = (TestAssets / webJarsNodeModulesDirectory).value.getAbsolutePath
           ),
           "resolveFromNodeModulesDir" -> JsBoolean(resolveFromWebjarsNodeModulesDir.value),
           "runMode" -> JsString(getCompileMode.value.toString),
@@ -187,13 +187,13 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
       }
 
       val assetCopyPairs = copyPairs(
-        (webJarsNodeModulesDirectory in Assets).value,
-        (webJarsNodeModules in Assets).value
+        (Assets / webJarsNodeModulesDirectory).value,
+        (Assets / webJarsNodeModules).value
       )
 
       val testAssetCopyPairs = copyPairs(
-        (webJarsNodeModulesDirectory in TestAssets).value,
-        (webJarsNodeModules in TestAssets).value
+        (TestAssets / webJarsNodeModulesDirectory).value,
+        (TestAssets / webJarsNodeModules).value
       )
 
       IO.copy(assetCopyPairs ++ testAssetCopyPairs)
@@ -249,7 +249,7 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
   def typescriptPipeTask: Def.Initialize[Task[Pipeline.Stage]] =
     Def.task {
       val s = streams.value
-      val filter = (includeFilter in typescript in Assets).value
+      val filter = (Assets / typescript / includeFilter).value
       inputMappings =>
         val isTypescript: PathMapping => Boolean = {
           case (file, _) => filter.accept(file)

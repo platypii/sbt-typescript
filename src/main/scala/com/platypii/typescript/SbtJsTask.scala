@@ -66,7 +66,7 @@ object SbtJsTask extends AutoPlugin {
     Seq(
       shellSource := {
         SbtWeb.copyResourceTo(
-          (target in Plugin).value / moduleName.value,
+          (Plugin / target).value / moduleName.value,
           shellFile.value,
           streams.value.cacheDirectory / "copy-resource"
         )
@@ -186,26 +186,26 @@ object SbtJsTask extends AutoPlugin {
   ): Def.Initialize[Task[Seq[File]]] =
     Def.task {
 
-      val nodeModulePaths = (nodeModuleDirectories in Plugin).value.map(_.getCanonicalPath)
-      val engineProps = Node.props((command in task).value, stdEnvironment = LocalEngine.nodePathEnv(nodeModulePaths.to[immutable.Seq]))
+      val nodeModulePaths = (Plugin / nodeModuleDirectories).value.map(_.getCanonicalPath)
+      val engineProps = Node.props((task / command).value, stdEnvironment = LocalEngine.nodePathEnv(nodeModulePaths.to[immutable.Seq]))
 
       val sources =
-        ((Keys.sources in task in config).value ** ((includeFilter in task in config).value -- (excludeFilter in task in config).value)).get.map(f =>
+        ((config / task / Keys.sources).value ** ((config / task / includeFilter).value -- (config / task / excludeFilter).value)).get.map(f =>
           new File(f.getCanonicalPath)
         )
 
       val logger: Logger = streams.value.log
-      val taskMsg = (taskMessage in task in config).value
-      val taskParallelism = (parallelism in task).value
+      val taskMsg = (config / task / taskMessage).value
+      val taskParallelism = (task / parallelism).value
       val currentState = state.value
-      val taskTimeout = (timeoutPerSource in task in config).value
-      val taskShellSource = (shellSource in task in config).value
-      val taskSourceDirectories = (sourceDirectories in task in config).value
-      val taskResources = (resourceManaged in task in config).value
-      val options = (jsOptions in task in config).value
+      val taskTimeout = (config / task / timeoutPerSource).value
+      val taskShellSource = (config / task / shellSource).value
+      val taskSourceDirectories = (config / task / sourceDirectories).value
+      val taskResources = (config / task / resourceManaged).value
+      val options = (config / task / jsOptions).value
 
-      implicit val opInputHasher: OpInputHasher[sbt.File] = (fileInputHasher in task in config).value
-      val results: (Set[File], Seq[Problem]) = incremental.syncIncremental((streams in config).value.cacheDirectory / "run", sources) {
+      implicit val opInputHasher: OpInputHasher[sbt.File] = (config / task / fileInputHasher).value
+      val results: (Set[File], Seq[Problem]) = incremental.syncIncremental((config / streams).value.cacheDirectory / "run", sources) {
         modifiedSources: Seq[File] =>
 
           if (modifiedSources.nonEmpty) {
@@ -250,7 +250,7 @@ object SbtJsTask extends AutoPlugin {
 
       val (filesWritten, problems) = results
 
-      CompileProblems.report((reporter in task).value, problems)
+      CompileProblems.report((task / reporter).value, problems)
 
       filesWritten.toSeq
     }
@@ -258,10 +258,10 @@ object SbtJsTask extends AutoPlugin {
   private def addUnscopedJsSourceFileTasks(sourceFileTask: TaskKey[Seq[File]]): Seq[Setting[_]] = {
     Seq(
       resourceGenerators += sourceFileTask.taskValue,
-      managedResourceDirectories += (resourceManaged in sourceFileTask).value
+      managedResourceDirectories += (sourceFileTask / resourceManaged).value
     ) ++ inTask(sourceFileTask)(
       Seq(
-        managedSourceDirectories ++= Def.settingDyn { sourceDependencies.value.map(resourceManaged in _).join }.value,
+        managedSourceDirectories ++= Def.settingDyn { sourceDependencies.value.map(_ / resourceManaged).join }.value,
         managedSources ++= Def.taskDyn { sourceDependencies.value.join.map(_.flatten) }.value,
         sourceDirectories := unmanagedSourceDirectories.value ++ managedSourceDirectories.value,
         sources := unmanagedSources.value ++ managedSources.value
@@ -277,12 +277,12 @@ object SbtJsTask extends AutoPlugin {
     */
   def addJsSourceFileTasks(sourceFileTask: TaskKey[Seq[File]]): Seq[Setting[_]] = {
     Seq(
-      sourceDependencies in sourceFileTask := Nil,
-      sourceFileTask in Assets := jsSourceFileTask(sourceFileTask, Assets).dependsOn(nodeModules in Plugin).value,
-      sourceFileTask in TestAssets := jsSourceFileTask(sourceFileTask, TestAssets).dependsOn(nodeModules in Plugin).value,
-      resourceManaged in sourceFileTask in Assets := webTarget.value / sourceFileTask.key.label / "main",
-      resourceManaged in sourceFileTask in TestAssets := webTarget.value / sourceFileTask.key.label / "test",
-      sourceFileTask := (sourceFileTask in Assets).value
+      sourceFileTask / sourceDependencies := Nil,
+      Assets / sourceFileTask := jsSourceFileTask(sourceFileTask, Assets).dependsOn(Plugin / nodeModules).value,
+      TestAssets / sourceFileTask := jsSourceFileTask(sourceFileTask, TestAssets).dependsOn(Plugin / nodeModules).value,
+      Assets / sourceFileTask / resourceManaged := webTarget.value / sourceFileTask.key.label / "main",
+      TestAssets / sourceFileTask / resourceManaged := webTarget.value / sourceFileTask.key.label / "test",
+      sourceFileTask := (Assets / sourceFileTask).value
     ) ++
       inConfig(Assets)(addUnscopedJsSourceFileTasks(sourceFileTask)) ++
       inConfig(TestAssets)(addUnscopedJsSourceFileTasks(sourceFileTask))

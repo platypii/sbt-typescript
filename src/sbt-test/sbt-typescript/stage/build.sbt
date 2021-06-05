@@ -3,7 +3,7 @@ lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 pipelineStages := Seq(typescriptPipe)
 
-logLevel in typescript := Level.Debug
+typescript / logLevel := Level.Debug
 
 val expected = Set("javascripts/main.js", "javascripts/main.js.map",
   "javascripts") map(_.replace("/", java.io.File.separator))

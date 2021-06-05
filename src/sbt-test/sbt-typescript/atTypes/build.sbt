@@ -7,4 +7,4 @@ libraryDependencies ++= Seq(
 )
 resolveFromWebjarsNodeModulesDir := true
 
-logLevel in typescript := Level.Debug
+typescript / logLevel := Level.Debug

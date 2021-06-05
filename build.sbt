@@ -4,7 +4,7 @@ name := "sbt-typescript"
 version := "4.2.2"
 
 // Scala needs to match sbt
-scalaVersion := "2.12.12"
+scalaVersion := "2.12.14"
 
 updateOptions := updateOptions.value.withCachedResolution(true)
 

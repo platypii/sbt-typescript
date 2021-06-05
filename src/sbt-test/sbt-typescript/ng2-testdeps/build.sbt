@@ -1,7 +1,7 @@
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
-logLevel in typescript := Level.Debug
+typescript / logLevel := Level.Debug
 
 libraryDependencies ++= Seq(
   "org.webjars.npm" % "angular2" % "2.0.0-beta.7",

@@ -15,4 +15,4 @@ libraryDependencies ++= Seq(
 
 // typingsFile := Some(baseDirectory.value / "typings" / "browser.d.ts")
 resolveFromWebjarsNodeModulesDir := true
-logLevel in typescript := Level.Debug
+typescript / logLevel := Level.Debug
