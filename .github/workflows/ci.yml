@@ -1,0 +1,33 @@
+name: CI
+on:
+  pull_request:
+  push:
+
+jobs:
+  sbt-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sbt "scripted sbt-typescript/angular2"
+      - run: sbt "scripted sbt-typescript/atTypes"
+      - run: sbt "scripted sbt-typescript/es6-es5"
+      - run: sbt "scripted sbt-typescript/ignoreCanNotFindModule"
+      - run: sbt "scripted sbt-typescript/inlinesourcemap"
+      # - run: sbt "scripted sbt-typescript/outfile"
+      - run: sbt "scripted sbt-typescript/sourcemap"
+      # - run: sbt "scripted sbt-typescript/stage"
+      # - run: sbt "scripted sbt-typescript/testassets"
+
+  scalafmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sbt scalafmtCheckAll
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm i
+      - run: npx tsc
+      - run: npm run lint

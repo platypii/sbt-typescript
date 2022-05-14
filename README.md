@@ -2,7 +2,10 @@
 
 ## Typescript :handshake: Scala
 
-[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://gitlab.com/baselinews/sbt-typescript/badges/master/pipeline.svg)](https://gitlab.com/baselinews/sbt-typescript) [![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
+
+[![workflow status](https://github.com/platypii/sbt-typescript/actions/workflows/ci.yml/badge.svg)](https://github.com/platypii/CloudBASE/actions)
+[![Maven Artifact](https://maven-badges.herokuapp.com/maven-central/com.github.platypii/sbt-typescript/badge.svg)](https://search.maven.org/search?q=g:com.github.platypii%20a:sbt-typescript)
+[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This sbt plugin compiles the TypeScript code in your Play application to javascript fit for consumption by your average browser and device.
 
