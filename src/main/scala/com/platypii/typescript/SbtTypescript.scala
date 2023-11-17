@@ -1,6 +1,7 @@
 package com.platypii.typescript
 
-import com.platypii.typescript.JsTaskImport.JsTaskKeys.{jsOptions, parallelism, shellFile, taskMessage}
+import com.typesafe.sbt.jse.JsTaskImport.JsTaskKeys.{jsOptions, shellFile, taskMessage}
+import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.web.Import.WebKeys._
 import com.typesafe.sbt.web.PathMapping
 import com.typesafe.sbt.web.SbtWeb.autoImport._
@@ -106,7 +107,6 @@ object SbtTypescript extends AutoPlugin with JsonProtocol {
       resolveFromWebjarsNodeModulesDir := false,
       typescript / logLevel := Level.Info,
       typescriptPipe := typescriptPipeTask.value,
-      parallelism := 1,
       compileMode := CompileMode.Compile,
       getCompileMode := getCompileModeTask.value,
       outFile := "main.js",

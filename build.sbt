@@ -4,7 +4,7 @@ name := "sbt-typescript"
 version := "4.6.4"
 
 // Scala needs to match sbt
-scalaVersion := "2.12.15"
+scalaVersion := "2.12.18"
 
 updateOptions := updateOptions.value.withCachedResolution(true)
 
@@ -19,9 +19,6 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "io.spray" %% "spray-json" % "1.3.6",
-  "com.typesafe" %% "jse" % "1.2.4", // TODO: Remove me
-
   // js dependencies
   "org.webjars.npm" % "typescript" % "4.6.4",
   // Used by ...?
@@ -33,11 +30,12 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("webjars", "maven"),
   Resolver.typesafeRepo("releases"),
   Resolver.sbtPluginRepo("releases"),
-  Resolver.sonatypeRepo("releases"),
   Resolver.mavenLocal
 )
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
+resolvers ++= Resolver.sonatypeOssRepos("snapshots")
+
+addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.0")
 
 enablePlugins(SbtPlugin)
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")
