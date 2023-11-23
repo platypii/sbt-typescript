@@ -1,7 +1,7 @@
 sbtPlugin := true
 organization := "com.github.platypii"
 name := "sbt-typescript"
-version := "4.6.4"
+version := "5.3.2"
 
 // Scala needs to match sbt
 scalaVersion := "2.12.18"
@@ -20,7 +20,7 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   // js dependencies
-  "org.webjars.npm" % "typescript" % "4.6.4",
+  "org.webjars.npm" % "typescript" % "5.3.2",
   // Used by ...?
   "org.webjars.npm" % "fs-extra" % "10.1.0",
   "org.webjars.npm" % "es6-shim" % "0.35.6",

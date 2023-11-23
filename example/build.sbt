@@ -2,7 +2,7 @@ name := "sbt-typescript-example"
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.13.6"
+scalaVersion := "2.13.12"
 
 // More compiler warnings
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Ywarn-dead-code")
