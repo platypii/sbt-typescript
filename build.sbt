@@ -26,8 +26,6 @@ libraryDependencies ++= Seq(
   "org.webjars.npm" % "es6-shim" % "0.35.6",
 )
 
-resolvers += Resolver.mavenLocal
-
 addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.5")
 
 enablePlugins(SbtPlugin)
