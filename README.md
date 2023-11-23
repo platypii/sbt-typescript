@@ -11,20 +11,20 @@ This sbt plugin compiles the TypeScript code in your Play application to javascr
 
 ## Setup
 
-Add the following line to your `project/plugins.sbt`:
+For Play 2.9+ projects, add the following line to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.platypii" % "sbt-typescript" % "4.6.4")
+addSbtPlugin("com.github.platypii" % "sbt-typescript" % "5.3.2")
 ```
+
+For Play 2.8- projects, use the previous version `4.6.4`.
 
 If your project is not a Play application you will have to enable `sbt-web` in `build.sbt`:
 
     lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
-It is REQUIRED that you have node js installed.
-It used to be possible to fallback to JVM-based trireme, but it no longer works with the latest javascript.
-Also sbt-js-engine broke with newer versions of npm.
-So now sbt-typescript just requires node. It's faster anyway.
+It is STRONGLY RECOMMENDED that you have node installed.
+It is possible to fallback to JVM-based trireme, but it is slow, and may not work with the latest javascript code.
 
 ### Dependencies
 
