@@ -26,16 +26,9 @@ libraryDependencies ++= Seq(
   "org.webjars.npm" % "es6-shim" % "0.35.6",
 )
 
-resolvers ++= Seq(
-  Resolver.bintrayRepo("webjars", "maven"),
-  Resolver.typesafeRepo("releases"),
-  Resolver.sbtPluginRepo("releases"),
-  Resolver.mavenLocal
-)
+resolvers += Resolver.mavenLocal
 
-resolvers ++= Resolver.sonatypeOssRepos("snapshots")
-
-addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.5-M1")
+addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.5")
 
 enablePlugins(SbtPlugin)
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")
