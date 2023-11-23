@@ -4,7 +4,7 @@ set -e
 shopt -s globstar
 
 # TODO: Fetch latest version
-VERSION=1.4.6
+VERSION=1.9.7
 
 echo "Setting sbt.version=$VERSION"
 
