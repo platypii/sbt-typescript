@@ -35,7 +35,7 @@ resolvers ++= Seq(
 
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
-addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.0")
+addSbtPlugin("com.github.sbt" % "sbt-js-engine" % "1.3.5-M1")
 
 enablePlugins(SbtPlugin)
 scriptedLaunchOpts := Seq(s"-Dproject.version=${version.value}")
